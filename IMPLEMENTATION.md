@@ -16,7 +16,7 @@ Completion requires evidence for every item below, not merely a green Python sui
   every allowed section combination, both player menus at every authored opener, failure,
   long server text in every shipped language, largest/highest captions, bright/dark backgrounds.
   Changed packages include a comparison against the previous version's previews.
-- [ ] Publisher emits a deterministic index, original package bytes at content-addressed URLs,
+- [x] Publisher emits a deterministic index, original package bytes at content-addressed URLs,
   preview URLs and hashes, and revocation reasons. Every published hash is checked.
 - [ ] GitHub Pages publication is exercised end-to-end; disabling publication still produces
   the same verifiable catalog artifact for private staging.
@@ -62,10 +62,18 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   passed, both HUDs had zero findings in all eleven languages, all 17 schema/parser fixtures
   agreed, and the authoring exercise passed in two lint runs. Minimal's complete 32-state native
   matrix passed and was visually inspected; all PNG dimensions/hashes were independently checked.
-  Reference's larger matrix and final catalog staging are still running.
+  Reference's complete 70-state matrix and catalog staging also passed. All 102 images were
+  inspected and hash/dimension checked. Two independent publications matched all 87 catalog
+  files byte for byte (index SHA-256 `c5b73c788f70622b009333f085ef953726bb6a4ae882875cb4b2d4aeaa4ebe4e`).
+  Inspection exposed that long-chapter scenes wrote PMS `title` instead of `tag`; a failing-then-
+  passing regression fixes it in app follow-up `a50307d32`. The corrected bundle must be pinned
+  and the complete matrix recaptured before the preview and seeded-PR acceptance boxes close.
 - The app's public schema URL returned HTTP 404 during the final authoring audit: the tracked
   `site/hud/` files were not copied by its Pages workflow. Follow-up branch
-  `fix/hud-authoring-publication` fixes that delivery gap and updates stale verification notes.
+  `fix/hud-authoring-publication` (`a50307d32`) fixes that delivery gap and updates stale
+  verification notes. It passed `make check` and `make check-nodef` on a clean committed tree,
+  17 toolkit tests, 80 workflow checks, before/after build-bench and a no-findings review. It also
+  adds a manual scoped-secret probe without publishing an app release.
 - Repository visibility and GitHub's combined Actions create/approve-PR setting remain unchanged
   pending owner approval. Pages is explicitly opt-in; private pushes retain the catalog artifact.
 - Deliberately incompatible protocol-fixture app releases exercise archive/manifest verification,
