@@ -1,7 +1,7 @@
 name: App release compatibility
 on:
   repository_dispatch:
-    types: [app-release]
+    types: [app-release, app-release-probe]
   schedule:
     - cron: '23 8 * * 1'
   workflow_dispatch:

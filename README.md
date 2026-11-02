@@ -11,3 +11,8 @@ The repository is private during PR12 staging. `IMPLEMENTATION.md` records the r
 evidence. Pushes always retain the verified catalog as a CI artifact. Set the repository variable
 `PUBLISH_PAGES=true` to deploy main automatically, or dispatch the workflow with `publish=true`
 for an explicit deployment. Pages hosting must first be available for the repository/account plan.
+
+The app workflow can send an `app-release-probe` after the dispatch secret is configured. This
+runs the same registry discovery/re-lint backstop without accepting a synthetic app-release pin.
+GitHub's combined Actions create/approve-PR setting must allow PR creation for the compatibility
+projection to open its review PR; the workflow never approves or merges it.
