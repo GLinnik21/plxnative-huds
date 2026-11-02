@@ -1,7 +1,5 @@
 """Put release compatibility changes in one reviewable branch/PR; never push main directly."""
 import json
-import os
-from pathlib import Path
 import subprocess
 
 
@@ -33,7 +31,8 @@ def main():
         body = ("Re-lints each current HUD with immutable app-release simulators in every shipped language. "
                 "Records language failures, compatibility ceilings and measured per-size headroom. "
                 "Author issues carry the lint evidence. Original package bytes remain unchanged.\n")
-        run("gh","pr","create","--head",branch,"--title","Update app-release compatibility","--body-file","-",input=body)    # Token-created pushes do not start push/PR workflows. Dispatch the read-only gate explicitly.
+        run("gh","pr","create","--head",branch,"--title","Update app-release compatibility","--body-file","-",input=body)
+    # Token-created pushes do not start push/PR workflows. Dispatch the read-only gate explicitly.
     run("gh","workflow","run","registry.yml","--ref",branch,"-f","publish=false")
 
 

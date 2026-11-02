@@ -7,9 +7,12 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import tempfile
+from urllib.request import build_opener
+from urllib.error import URLError
 import sys
-from catalog import Invalid, canonical, oldest, packages, read_json, revoked
-from simulator import Simulator, acquire, toolchains
+from catalog import Invalid, canonical, oldest, packages, public_origin, read_json, revoked
+from simulator import SecureRedirect, Simulator, acquire, toolchains
 
 
 def expected(sim, package):
@@ -45,16 +48,21 @@ def verify(sim, package, directory):
 def differences(current, previous, output):
     """Keep the previous image and an amplified absolute-difference image beside changed captures."""
     result = []
-    for image in sorted(current.glob("*.png")):
-        before = previous / image.name
-        if not before.is_file():
-            result.append({"file": image.name, "status": "new"}); continue
+    current_manifest = read_json(current / "manifest.json")
+    before_manifest = read_json(previous / "manifest.json") if (previous / "manifest.json").is_file() else {"scenes":[]}
+    before_states = {scene["state"]:scene["file"] for scene in before_manifest["scenes"]}
+    for scene in current_manifest["scenes"]:
+        image = current / scene["file"]
+        before_name = before_states.get(scene["state"])
+        before = previous / before_name if before_name else None
+        if before is None or not before.is_file():
+            result.append({"file": image.name, "state":scene["state"], "status": "new"}); continue
         same = hashlib.sha256(image.read_bytes()).digest() == hashlib.sha256(before.read_bytes()).digest()
-        item = {"file": image.name, "status": "identical" if same else "changed"}
+        item = {"file": image.name, "state":scene["state"], "status": "identical" if same else "changed"}
         if not same:
             output.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(before, output / (image.stem + ".before.png"))
-            target = output / (image.stem + ".diff.png")
+            shutil.copyfile(before, output / (scene["state"] + ".before.png"))
+            target = output / (scene["state"] + ".diff.png")
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(before), "-i", str(image),
                             "-filter_complex", "blend=all_mode=difference,lutrgb=r=val*4:g=val*4:b=val*4",
                             "-frames:v", "1", str(target)], check=True)
@@ -65,29 +73,68 @@ def differences(current, previous, output):
     return result
 
 
-def render(root, cache, output, previous_root=None, previous_previews=None, local=None):
+def published(sim, package, directory, base_url):
+    """Reuse only a complete, byte-verified matrix from the identical pinned compiler."""
+    public_origin(base_url)
+    prefix = base_url.rstrip("/") + "/previews/" + package.sha256 + "/"
+    directory.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="preview-reuse-",dir=directory.parent) as temporary:
+        stage = Path(temporary)
+        def fetch(name, maximum):
+            with build_opener(SecureRedirect).open(prefix + name,timeout=30) as response:
+                content = response.read(maximum + 1)
+            if len(content) > maximum:
+                raise Invalid("published preview exceeds its byte bound")
+            (stage / name).write_bytes(content)
+        try:
+            fetch("manifest.json",2*1024*1024)
+            manifest = read_json(stage / "manifest.json")
+            for scene in manifest["scenes"]:
+                name = scene["file"]
+                if Path(name).name != name or not name.endswith(".png"):
+                    raise Invalid("unsafe published preview filename")
+                fetch(name,32*1024*1024)
+            verify(sim,package,stage)
+        except (Invalid,OSError,ValueError,KeyError,URLError):
+            return False
+        if directory.exists():
+            shutil.rmtree(directory)
+        shutil.copytree(stage,directory)
+        return True
+
+
+def render(root, cache, output, previous_root=None, previous_previews=None, local=None, only=None, reuse_url=None):
     pins = toolchains(root)
     rejected = {item["sha256"] for item in revoked(root)}
     before = {p.id: p for p in packages(previous_root)} if previous_root else {}
     prepared = set()
-    for package in packages(root):
+    candidates = packages(root)
+    if only is not None:
+        candidates = [package for package in candidates if package.id == only]
+        if not candidates:
+            raise Invalid("requested package does not exist")
+    for package in candidates:
         if package.sha256 in rejected:
             continue
         pin = oldest(package, pins)
         sim = Simulator(local or acquire(pin, cache), pin, root / pin["calibration"])
-        env = dict(sim.env)
-        env["PLXNATIVE_DEMO_CACHE"] = str((cache.parent / "demo-library").resolve())
-        if pin["sha256"] not in prepared:
-            for action in ("fetch", "derive"):
-                subprocess.run([sys.executable, str(sim.root / "tools/demo_library.py"), action], env=env, check=True, timeout=1200)
-            prepared.add(pin["sha256"])
         directory = output / package.sha256
-        if directory.exists():
-            shutil.rmtree(directory)
-        subprocess.run([sys.executable, str(sim.root / "tools/hud_preview.py"), "--bin", str(sim.binary),
-                        "--hud", str(package.path.resolve()), "--out", str(directory.resolve())],
-                       env=env, check=True, timeout=3600)
-        verify(sim, package, directory)
+        reused = reuse_url is not None and published(sim,package,directory,reuse_url)
+        if reused:
+            print("Reused complete pinned previews:",package.id,flush=True)
+        else:
+            env = dict(sim.env)
+            env["PLXNATIVE_DEMO_CACHE"] = str((cache.parent / "demo-library").resolve())
+            if pin["sha256"] not in prepared:
+                for action in ("fetch", "derive"):
+                    subprocess.run([sys.executable, str(sim.root / "tools/demo_library.py"), action], env=env, check=True, timeout=1200)
+                prepared.add(pin["sha256"])
+            if directory.exists():
+                shutil.rmtree(directory)
+            subprocess.run([sys.executable, str(sim.root / "tools/hud_preview.py"), "--bin", str(sim.binary),
+                            "--hud", str(package.path.resolve()), "--out", str(directory.resolve())],
+                           env=env, check=True, timeout=3600)
+            verify(sim, package, directory)
         earlier = before.get(package.id)
         if earlier and previous_previews:
             differences(directory, previous_previews / earlier.sha256, output / "diffs" / package.id)
@@ -101,8 +148,10 @@ def main():
     parser.add_argument("--previous-root", type=Path)
     parser.add_argument("--previous-previews", type=Path)
     parser.add_argument("--local-simulator", type=Path)
+    parser.add_argument("--package")
+    parser.add_argument("--reuse-url")
     args = parser.parse_args()
-    render(args.root, args.cache, args.out, args.previous_root, args.previous_previews, args.local_simulator)
+    render(args.root, args.cache, args.out, args.previous_root, args.previous_previews, args.local_simulator, args.package, args.reuse_url)
 
 
 if __name__ == "__main__":

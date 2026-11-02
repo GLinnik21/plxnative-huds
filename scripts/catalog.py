@@ -163,6 +163,11 @@ def generate(root: Path, output: Path, previews: Path, base_url: str, compatibil
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(content)
             art.append({**scene, "file": published_name, "url": f"{base_url}/previews/{package.sha256}/{published_name}"})
+        # Preserve the renderer's complete proof for hash-checked reuse of unchanged entries.
+        proof = {**manifest, "scenes": art}
+        proof_path = output / "previews" / package.sha256 / "manifest.json"
+        proof_path.parent.mkdir(parents=True, exist_ok=True)
+        proof_path.write_bytes(canonical(proof))
         target = output / "p" / (package.sha256 + ".plxhud.json")
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(package.content)

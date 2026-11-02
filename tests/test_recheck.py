@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from recheck import verdict, update, notify
+from recheck import verdict, update, notify, issue
 from catalog import Invalid, Package
 
 
@@ -29,9 +29,28 @@ class ReleaseCheck(unittest.TestCase):
             self.assertEqual(value["packages"]["hash"]["app_max"], "0.10.0")
             self.assertEqual(value["packages"]["hash"]["unfit"][0]["langs"], ["de", "en"])
 
+    def test_recovery_removes_the_old_ceiling_and_preserves_the_failure_interval(self):
+        languages=["en","de"]
+        good=verdict({"findings":[]},languages)
+        bad=verdict({"findings":[{"code":"HUD-E1001"}]},languages)
+        value=update({},"hash","0.10.0",good,languages)
+        value=update(value,"hash","0.11.0",bad,languages)
+        value=update(value,"hash","0.12.0",good,languages)
+        self.assertNotIn("app_max",value["packages"]["hash"])
+        self.assertEqual(value["packages"]["hash"]["unfit"],
+                         [{"from":"0.11.0","langs":["de","en"]},{"from":"0.12.0","langs":[]}])
+
     def test_unknown_language_is_not_silently_dropped(self):
         with self.assertRaises(Invalid):
             verdict({"findings": [{"code": "HUD-E0601", "context": {"lang": "xx"}}]}, ["en"])
+
+    def test_large_regression_keeps_a_bounded_valid_json_issue_excerpt(self):
+        package = Package(Path("x"), {"name":"Demo","version":"1.0.0","author":"Author"}, b"", "hash")
+        report = {"findings":[{"code":"HUD-E0601","message":"long diagnostic"*100} for _ in range(200)]}
+        _,_,body = issue(package,"0.11.0",{"langs":["de"],"report":report},["author"])
+        self.assertLess(len(body.encode()),60000)
+        self.assertIn('"truncated": true',body)
+        self.assertIn("@author",body)
 
     def test_closed_author_issue_is_not_duplicated_by_the_weekly_backstop(self):
         package = Package(Path("x"), {"name": "Demo", "version": "1.0.0", "author": "Author"}, b"", "hash")

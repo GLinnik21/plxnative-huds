@@ -18,7 +18,7 @@ class Pinning(unittest.TestCase):
             root = Path(directory)
             binary = root / "bin/plxnative-sim"
             binary.parent.mkdir(); binary.write_bytes(b"binary")
-            manifest = {"app_version":"0.10.0", "source_sha":"a"*40, "formats":["1.0"],
+            manifest = {"protocol":1,"reported_version":"0.10.0","development":False,"app_version":"0.10.0", "source_sha":"a"*40, "formats":["1.0"],
                         "files":{"bin/plxnative-sim":hashlib.sha256(b"binary").hexdigest()}}
             content = canonical(manifest)
             (root / "bundle.json").write_bytes(content)

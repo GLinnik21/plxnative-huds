@@ -34,6 +34,8 @@ def validate_pin(pin: dict):
             raise Invalid(f"simulator pin needs exact {name}")
     if not pin.get("formats") or not isinstance(pin.get("bytes"), int) or pin["bytes"] <= 0:
         raise Invalid("simulator pin needs formats and archive byte count")
+    if not isinstance(pin.get("development",False),bool):
+        raise Invalid("development provenance must be a boolean")
     calibration = Path(pin.get("calibration", ""))
     if not calibration.parts or calibration.is_absolute() or ".." in calibration.parts:
         raise Invalid("calibration must be a registry-relative path")
@@ -75,6 +77,10 @@ def verify_bundle(root: Path, pin: dict):
     if hashlib.sha256((root / "bundle.json").read_bytes()).hexdigest() != pin["manifest_sha256"]:
         raise Invalid("simulator manifest does not match the immutable pin")
     manifest = read_json(root / "bundle.json")
+    expected_version = pin["app_version"] + ("-dev" if pin.get("development",False) else "")
+    if (manifest.get("protocol") != 1 or manifest.get("reported_version") != expected_version
+        or manifest.get("development") != pin.get("development",False)):
+        raise Invalid("simulator release/development provenance mismatch")
     for key in ("app_version", "source_sha", "formats"):
         if manifest.get(key) != pin[key]:
             raise Invalid(f"simulator provenance mismatch: {key}")

@@ -1,0 +1,42 @@
+# Measured registry text headroom
+
+The initial corpus was collected on 2026-11-02 from the real rooted LG development TV
+(app source `9266c34e7`) and the Linux/Ubuntu 24.04 simulator built by app CI run
+[41461558740](https://github.com/GLinnik21/plx-native/actions/runs/41461558740)
+(source `60410e182b1474cf10c48dac89310fdfd0ac0c7e`). The TV session used the repository TV lock,
+a synthetic guest/mock, a muted TV and its panel on. Deployment verified all 47 files.
+The native diagnostic reported `hud-text-metrics: wrote 12276 samples`.
+
+The TV's `/usr/lib/libSDL2_ttf-2.0.so.0` SHA-256 was
+`ab1dd4bd1648055f028459a573384a381e5a8ce276f22493910543fc756f3c42`.
+Font identities are recorded in both reports and match exactly. No account, server address,
+credential or device serial is part of the stored measurement reports.
+
+`tv-metrics.json` is the native report. `60410e182.host.json` is the Linux CI report;
+`60410e182.json` records their hashes, complete corpus coverage and worst positive differences.
+There are 12,276 rows: all eleven shipped languages, every supported rung and both weights,
+using the lint's actual label/command/chapter/episode-prefix candidates and clock-width envelopes.
+A clock envelope can choose different widest digits on each renderer; its maximum width is compared.
+
+| Rung | Registry margin, px |
+|---|---:|
+| MICRO | 7 |
+| CAPTION | 6 |
+| LABEL | 4 |
+| BODY | 4 |
+| HEADLINE | 7 |
+| TITLE | 6 |
+| DISPLAY | 6 |
+| HUD_TITLE | 8 |
+| HERO | 9 |
+
+Each margin is the ceiling of the maximum positive `TV width - Linux width` at that rung.
+Registry lint receives it explicitly with `--text-skew`; normal TV admission adds zero and uses
+its own native widths. These measurements describe this renderer/font corpus; installed HUDs
+continue to compile locally on each TV.
+
+Every accepted simulator pin has a profile naming its exact host source and font bytes. The
+release job compares a new host corpus with this TV evidence and refuses changed/missing text or
+fonts instead of inventing a margin. New translations/fonts require a fresh native corpus.
+The initial `60410e182` profile is iteration evidence; the final bootstrap pin gets its own
+source-bound profile from the published CI artifact before the seeded PR can pass.

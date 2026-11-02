@@ -16,7 +16,7 @@ translated app labels, focus, captions and native menus remain owned by PlxNativ
    A finding includes a JSON pointer, language, state and measured room; fix the indicated layout
    instead of shortening translated app labels. Server titles may elide. Fixed app text must fit.
 6. On Ubuntu 24.04 with Mesa, Xvfb, ffmpeg and Pillow installed, run
-   `xvfb-run -a python3 scripts/previews.py`. Inspect `out/previews/<package hash>/`.
+   `xvfb-run -a python3 scripts/previews.py` (use `venv --system-site-packages` when Pillow comes from apt). Inspect `out/previews/<package hash>/`.
    The matrix includes transport states, episode navigation, section combinations, every menu
    opener, long titles in all languages, failure, large/high captions and bright/dark scenes.
 7. Submit a PR with the package and README. CI records the lint, previews and visual differences

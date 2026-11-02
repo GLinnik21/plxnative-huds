@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -25,7 +26,7 @@ def verdict(report, languages):
     failed = sorted(lang for lang, items in failures.items() if items)
     if nontext:
         failed = sorted(languages)
-    return {"langs": failed, "nontext": nontext, "report": report}
+    return {"langs": failed, "nontext": nontext, "all_failed": set(failed) == set(languages), "report": report}
 
 
 def update(previous, digest, version, result, languages):
@@ -45,12 +46,12 @@ def update(previous, digest, version, result, languages):
             last = check["langs"]
     entry["unfit"] = unfit
     entry.pop("app_max", None)
-    for index, (at, check) in enumerate(checks):
-        if check["nontext"] or set(check["langs"]) == set(languages):
-            passed = [version for version, earlier in checks[:index] if not earlier["langs"]]
-            if passed:
-                entry["app_max"] = passed[-1]
-            break
+    def fatal(check):
+        return check["nontext"] or check.get("all_failed",set(check["langs"]) == set(languages))
+    if checks and fatal(checks[-1][1]):
+        passed = [at for at, check in checks[:-1] if not fatal(check)]
+        if passed:
+            entry["app_max"] = passed[-1]
     return value
 
 
@@ -60,17 +61,29 @@ def issue(package, version, result, contacts=()):
     mention = f'@{author["github"]}' if isinstance(author, dict) and author.get("github") else str(author)
     if contacts:
         mention = ", ".join("@" + name for name in contacts)
+    report = {"findings": result["report"]["findings"]}
+    full_count = len(report["findings"])
+    # Cost lines are not failure evidence. Bound issue text by encoded bytes; the complete lint
+    # stays in compatibility.json and the workflow artifact even for a large regression.
+    while len(json.dumps(report,ensure_ascii=False,indent=2).encode()) > 48000 and report["findings"]:
+        report["findings"] = report["findings"][:len(report["findings"])//2]
+        report.update(total_findings=full_count, truncated=True)
     body = (f'{marker}\n{mention}, **{package.metadata["name"]} {package.metadata["version"]}** fails '
             f'fit checks on PlxNative **{version}** in: {", ".join(result["langs"])}.\n\n'
             'The package bytes have not changed. Please submit a newer HUD version after addressing the findings.\n\n'
-            '```json\n' + json.dumps(result["report"], ensure_ascii=False, indent=2) + '\n```\n')
+            '```json\n' + json.dumps(report, ensure_ascii=False, indent=2) + '\n```\n')
+    if os.environ.get("GITHUB_RUN_ID") and os.environ.get("GITHUB_REPOSITORY"):
+        url = "https://github.com/" + os.environ["GITHUB_REPOSITORY"] + "/actions/runs/" + os.environ["GITHUB_RUN_ID"]
+        body += f'\n[Complete per-language lint evidence]({url}) is retained in the workflow artifact and compatibility projection.\n'
+    body += "\nCompatibility key: `" + marker.removeprefix("<!-- ").removesuffix(" -->") + "`\n"
     return marker, f'{package.metadata["name"]}: compatibility with PlxNative {version}', body
 
 
 def notify(repo, package, version, result, contacts=()):
     marker, title, body = issue(package, version, result, contacts)
     # Search both open and closed issues. Closing the author's issue must not cause a weekly duplicate.
-    process = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "all", "--search", marker,
+    query = '"' + marker.removeprefix("<!-- ").removesuffix(" -->") + '" in:body'
+    process = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "all", "--search", query,
                               "--json", "body", "--limit", "100"], capture_output=True, text=True, check=True)
     if any(marker in item["body"] for item in json.loads(process.stdout)):
         return
