@@ -1,0 +1,43 @@
+from pathlib import Path
+import sys
+import unittest
+from unittest.mock import patch
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from recheck import verdict, update, notify
+from catalog import Invalid, Package
+
+
+class ReleaseCheck(unittest.TestCase):
+    def test_translation_regression_is_language_specific_and_recovery_is_recorded(self):
+        report = {"findings": [{"code": "HUD-E0601", "context": {"lang": "de"}}]}
+        languages = ["en", "de"]
+        fit = verdict(report, languages)
+        self.assertEqual(fit["langs"], ["de"])
+        value = update({}, "hash", "0.10.0", verdict({"findings": []}, languages), languages)
+        value = update(value, "hash", "0.11.0", fit, languages)
+        self.assertNotIn("app_max", value["packages"]["hash"])
+        value = update(value, "hash", "0.12.0", verdict({"findings": []}, languages), languages)
+        self.assertEqual(value["packages"]["hash"]["unfit"], [{"from": "0.11.0", "langs": ["de"]}, {"from": "0.12.0", "langs": []}])
+
+    def test_nontext_regression_or_every_language_caps_at_last_passed_app(self):
+        languages = ["en", "de"]
+        good = verdict({"findings": []}, languages)
+        for findings in ([{"code": "HUD-E0601"}], [{"code": "HUD-E1001", "context": {"lang": "de"}}]):
+            bad = verdict({"findings": findings}, languages)
+            value = update({}, "hash", "0.10.0", good, languages)
+            value = update(value, "hash", "0.11.0", bad, languages)
+            self.assertEqual(value["packages"]["hash"]["app_max"], "0.10.0")
+            self.assertEqual(value["packages"]["hash"]["unfit"][0]["langs"], ["de", "en"])
+
+    def test_unknown_language_is_not_silently_dropped(self):
+        with self.assertRaises(Invalid):
+            verdict({"findings": [{"code": "HUD-E0601", "context": {"lang": "xx"}}]}, ["en"])
+
+    def test_closed_author_issue_is_not_duplicated_by_the_weekly_backstop(self):
+        package = Package(Path("x"), {"name": "Demo", "version": "1.0.0", "author": "Author"}, b"", "hash")
+        result = {"langs": ["de"], "report": {"findings": []}}
+        with patch("recheck.subprocess.run") as run:
+            run.return_value.stdout = '[{"body":"<!-- plxnative-hud-fit:hash:0.11.0 -->"}]'
+            notify("owner/registry", package, "0.11.0", result)
+            self.assertEqual(run.call_count, 1)
+            self.assertIn("all", run.call_args.args[0])

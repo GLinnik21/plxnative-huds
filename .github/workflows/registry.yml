@@ -1,0 +1,95 @@
+name: HUD registry
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Deploy the verified catalog to Pages'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: registry-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install renderer prerequisites
+        run: |
+          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri ffmpeg python3-pil python3-venv
+          python3 -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .cache
+          key: hud-registry-${{ runner.os }}-${{ hashFiles('toolchains.json') }}
+      - name: Prepare the preceding package versions
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != 0000000000000000000000000000000000000000 ]; then
+            mkdir -p out/previous
+            git archive "$BASE_SHA" | tar -x -C out/previous
+          fi
+      - name: Unit checks and schema/parser agreement in every language
+        run: |
+          .venv/bin/python -m unittest discover -s tests -v
+          if [ -d out/previous/huds ]; then
+            .venv/bin/python scripts/validate.py --previous out/previous
+          else
+            .venv/bin/python scripts/validate.py
+          fi
+          .venv/bin/python scripts/author_exercise.py > out/author-exercise.json
+      - name: Render the complete native state matrix
+        run: |
+          if [ -d out/previous/huds ]; then
+            xvfb-run -a -s '-screen 0 1920x1080x24' .venv/bin/python scripts/previews.py --root out/previous --out out/before
+            xvfb-run -a -s '-screen 0 1920x1080x24' .venv/bin/python scripts/previews.py --previous-root out/previous --previous-previews out/before
+          else
+            xvfb-run -a -s '-screen 0 1920x1080x24' .venv/bin/python scripts/previews.py
+          fi
+      - name: Stage and check the public-byte catalog
+        run: |
+          .venv/bin/python scripts/publish.py --base-url https://glinnik21.github.io/plxnative-huds
+          .venv/bin/python scripts/check_site.py out/site
+      - name: Keep lint, preview, diff and authoring evidence privately
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: registry-review
+          path: out/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Stage verified Pages output
+        if: github.event_name == 'push' || inputs.publish
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          path: out/site
+  publish:
+    needs: validate
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5

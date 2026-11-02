@@ -1,0 +1,37 @@
+name: App release compatibility
+on:
+  repository_dispatch:
+    types: [app-release]
+  schedule:
+    - cron: '23 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: compatibility
+  cancel-in-progress: false
+
+jobs:
+  relint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Find missed app releases and re-lint every entry in all shipped languages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/releases.py --event "$GITHUB_EVENT_PATH"
+          python3 scripts/recheck.py --notify-repo "$GITHUB_REPOSITORY"
+      - name: Propose the compatibility projection for review
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/compatibility_pr.py
