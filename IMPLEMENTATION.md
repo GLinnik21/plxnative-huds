@@ -72,7 +72,15 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   and the complete matrix recaptured before the preview and seeded-PR acceptance boxes close.
   That corrected bundle is now published, independently hash-verified and pinned; its bundled
   `hud_preview.py` matches the reviewed correction byte for byte. The next seeded CI run will
-  recapture the stress cases with actual long chapter captions.
+  recapture the stress cases with actual long chapter captions. Corrected run
+  [41489989922](https://github.com/GLinnik21/plxnative-huds/actions/runs/41489989922) passed
+  validation and Minimal's 32-state matrix (all 32 PNGs byte-identical to the first run).
+  Reference saved 69 of 70 checked PNG/log pairs, including ten corrected long-chapter languages,
+  before the registry's 3,600-second whole-process timeout interrupted the Dutch capture. The
+  partial images and terminal log are preserved; they are not accepted as a complete matrix.
+  The retry allows 90 minutes for each full matrix and 210 minutes for a previous/current job,
+  while preserving the app tool's 180-second per-scene settle guard and full state coverage.
+  Unbuffered Python progress makes completed scene names visible during the job.
 - The app's public schema URL returned HTTP 404 during the final authoring audit: the tracked
   `site/hud/` files were not copied by its Pages workflow. Follow-up branch
   `fix/hud-authoring-publication` (`a50307d32`) fixes that delivery gap and updates stale

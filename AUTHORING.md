@@ -20,6 +20,8 @@ translated app labels, focus, captions and native menus remain owned by PlxNativ
    `xvfb-run -a python3 scripts/previews.py` (use `venv --system-site-packages` when Pillow comes from apt). Inspect `out/previews/<package hash>/`.
    The matrix includes transport states, episode navigation, section combinations, every menu
    opener, long titles in all languages, failure, large/high captions and bright/dark scenes.
+   CI allows 90 minutes per full matrix; an individual scene still fails if it cannot settle
+   within 180 seconds. A changed package may render both its preceding and current versions.
 7. Submit a PR with the package and README. CI records the lint, previews and visual differences
    from the preceding version. Increment `version` whenever the package bytes change.
 

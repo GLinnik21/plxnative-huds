@@ -74,7 +74,8 @@ jobs:
   render:
     needs: validate
     runs-on: ubuntu-24.04
-    timeout-minutes: 150
+    # Previous and current matrices may each take 90 minutes, plus setup and upload.
+    timeout-minutes: 210
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -99,6 +100,7 @@ jobs:
       - name: Render and compare the complete native matrix
         env:
           PACKAGE: ${{ matrix.id }}
+          PYTHONUNBUFFERED: '1'
           REUSE: https://glinnik21.github.io/plxnative-huds
         run: |
           mkdir -p out/previews

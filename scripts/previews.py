@@ -133,7 +133,9 @@ def render(root, cache, output, previous_root=None, previous_previews=None, loca
                 shutil.rmtree(directory)
             subprocess.run([sys.executable, str(sim.root / "tools/hud_preview.py"), "--bin", str(sim.binary),
                             "--hud", str(package.path.resolve()), "--out", str(directory.resolve())],
-                           env=env, check=True, timeout=3600)
+                           # A full matrix has its own budget; each scene still has the
+                           # app tool's independent 180-second settle deadline.
+                           env=env, check=True, timeout=90 * 60)
             verify(sim, package, directory)
         earlier = before.get(package.id)
         if earlier and previous_previews:
