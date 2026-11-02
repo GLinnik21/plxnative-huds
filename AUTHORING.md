@@ -9,7 +9,8 @@ translated app labels, focus, captions and native menus remain owned by PlxNativ
    and register that contact in `maintainers.json` for compatibility notifications.
 3. Read the pinned [format guide](https://github.com/GLinnik21/plx-native/blob/main/docs/hud-plugins.md)
    and use `schema/1.0.json` for editor completion. Follow the examples' theme and size rungs.
-4. Install Python 3.12 and `python3 -m pip install -r requirements.txt` in a virtual environment.
+4. On Ubuntu 24.04 x86_64 (including a Linux VM or WSL), install Python 3.12 and
+   `python3 -m pip install -r requirements.txt` in a virtual environment.
    Run `python3 scripts/validate.py`. It downloads the hash-pinned Linux simulator, chooses the
    oldest compatible app for each package, and lints **every shipped language**. No Rust build is needed.
 5. Address every finding, including `HUD-W0602`. A warning about text headroom fails registry CI.
