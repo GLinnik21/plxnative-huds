@@ -36,8 +36,10 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
 ## Implementation checkpoints
 
 - App PR #1206 passed all 21 reported CI checks (20 passed, one expected skip) and squash-landed.
-  Published developer simulator run [41473507619](https://github.com/GLinnik21/plx-native/actions/runs/41473507619)
-  passed; the bootstrap pin binds its 38,910,181-byte archive, source, manifest and 273 files.
+  The corrected developer simulator from app PR #1209 was published by run
+  [41487654770](https://github.com/GLinnik21/plx-native/actions/runs/41487654770). The active
+  bootstrap pin binds its 38,910,211-byte archive, source `1c9a75db47dfbfddffdae133684698507be263cf`,
+  manifest and 273 files.
   It is explicitly a prerelease developer utility, not a stable television app release.
 - Registry unit suite: 28 tests pass, including preserved package bytes, deterministic publication,
   revocation, oldest-compatible selection, immutable pins/manifest tamper checks, measured per-rung
@@ -68,6 +70,9 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   Inspection exposed that long-chapter scenes wrote PMS `title` instead of `tag`; a failing-then-
   passing regression fixes it in app follow-up `a50307d32`. The corrected bundle must be pinned
   and the complete matrix recaptured before the preview and seeded-PR acceptance boxes close.
+  That corrected bundle is now published, independently hash-verified and pinned; its bundled
+  `hud_preview.py` matches the reviewed correction byte for byte. The next seeded CI run will
+  recapture the stress cases with actual long chapter captions.
 - The app's public schema URL returned HTTP 404 during the final authoring audit: the tracked
   `site/hud/` files were not copied by its Pages workflow. Follow-up branch
   `fix/hud-authoring-publication` (`a50307d32`) fixes that delivery gap and updates stale
@@ -79,7 +84,8 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   [41487108486](https://github.com/GLinnik21/plx-native/actions/runs/41487108486) deployed it;
   all 27 authoring URLs were independently fetched from `https://plxnative.com/hud/` and matched
   source bytes. Corrected toolkit publication run
-  [41487654770](https://github.com/GLinnik21/plx-native/actions/runs/41487654770) is in progress.
+  [41487654770](https://github.com/GLinnik21/plx-native/actions/runs/41487654770) succeeded; its
+  source-bound profile again measures 12,276 rows directly against TV evidence with 4–9 px margins.
 - Repository visibility and GitHub's combined Actions create/approve-PR setting remain unchanged
   pending owner approval. Pages is explicitly opt-in; private pushes retain the catalog artifact.
 - Deliberately incompatible protocol-fixture app releases exercise archive/manifest verification,

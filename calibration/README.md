@@ -42,7 +42,9 @@ text-renderer library hashes and type scale match a measured baseline. The profi
 the original measurement and its current host binding; it does not claim the new strings were
 measured on the TV. Changed fonts, renderer libraries or type sizes with a changed corpus require
 fresh native evidence. Local compilation on each TV remains authoritative.
-The initial `60410e182` profile is iteration evidence; the final bootstrap pin gets its own
-source-bound profile from published CI run [41473507619](https://github.com/GLinnik21/plx-native/actions/runs/41473507619),
-source `f1436ba4746c477537144276ff928840f0be7566`. The manifest-hash-named profile and host report
-record the final bootstrap pin; its complete corpus gives the same table above.
+The `60410e182` and `f1436ba` profiles retain earlier iteration evidence. The active corrected
+bootstrap pin is source `1c9a75db47dfbfddffdae133684698507be263cf`, published by app CI run
+[41487654770](https://github.com/GLinnik21/plx-native/actions/runs/41487654770). Its manifest-hash-
+named profile and host report (`3f9a62fc…`) compare all 12,276 rows directly with the native report,
+without carrying a changed corpus, and produce the same margins above. The pinned bundle's preview
+fixture now sets actual PMS chapter `tag` values for the long-title stress cases.
