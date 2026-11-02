@@ -6,11 +6,11 @@ as squash `f1436ba4746c477537144276ff928840f0be7566`.
 
 Completion requires evidence for every item below, not merely a green Python suite:
 
-- [ ] App publishes a relocatable Linux simulator bundle with source SHA, app version, fonts,
+- [x] App publishes a relocatable Linux simulator bundle with source SHA, app version, fonts,
   native host libraries, schema, fixture corpus and the existing mock/screenshot machinery.
-- [ ] Registry pins immutable simulator bundles by SHA-256 and chooses the oldest compatible
+- [x] Registry pins immutable simulator bundles by SHA-256 and chooses the oldest compatible
   app version for each package. A new app release cannot silently replace an older pin.
-- [ ] Submission CI uses the app's lint in all shipped languages, compares the generated schema
+- [x] Submission CI uses the app's lint in all shipped languages, compares the generated schema
   against the mirror, and checks schema/parser agreement on the fixture corpus.
 - [ ] Linux/Xvfb previews cover transport states, episode navigation, Up Next, both Skip kinds,
   every allowed section combination, both player menus at every authored opener, failure,
@@ -25,7 +25,7 @@ Completion requires evidence for every item below, not merely a green Python sui
 - [ ] An app release sends repository_dispatch; weekly re-lint is the fallback. Compatibility
   data records per-language unfit results, caps app.max after total failure, and files a deduplicated
   author issue. These branches are exercised using a deliberately incompatible test release.
-- [ ] Simulator/TV text-width corpus is measured at every supported rung in all languages.
+- [x] Simulator/TV text-width corpus is measured at every supported rung in all languages.
   The measured per-rung margin is enforced only by registry CI, without weakening TV fit checks.
 - [ ] A seeded PR containing Reference and Minimal passes actual CI and produces inspected previews.
 - [ ] App gates, before/after build-bench, review, and squash landing complete; registry also
@@ -57,9 +57,17 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   library load and relocation checks. The first archive's 273 manifest-bound files were independently
   hash-verified; its real corpus matches the TV's fonts and text coverage. Calibration evidence is in
   `calibration/`, with per-rung margins of 4–9 px and zero added margin on normal TV admission.
-- Stock Draft 2020-12/schema/parser agreement passed over all 17 app corpus packages in a real
-  local simulator iteration. Both seeded HUDs also returned zero findings with measured headroom
-  in that iteration. These do not replace the canonical Linux seeded-PR checks still pending.
+- Seeded [registry PR #1](https://github.com/GLinnik21/plxnative-huds/pull/1), Linux run
+  [41476101187](https://github.com/GLinnik21/plxnative-huds/actions/runs/41476101187): validation
+  passed, both HUDs had zero findings in all eleven languages, all 17 schema/parser fixtures
+  agreed, and the authoring exercise passed in two lint runs. Minimal's complete 32-state native
+  matrix passed and was visually inspected; all PNG dimensions/hashes were independently checked.
+  Reference's larger matrix and final catalog staging are still running.
+- The app's public schema URL returned HTTP 404 during the final authoring audit: the tracked
+  `site/hud/` files were not copied by its Pages workflow. Follow-up branch
+  `fix/hud-authoring-publication` fixes that delivery gap and updates stale verification notes.
+- Repository visibility and GitHub's combined Actions create/approve-PR setting remain unchanged
+  pending owner approval. Pages is explicitly opt-in; private pushes retain the catalog artifact.
 - Deliberately incompatible protocol-fixture app releases exercise archive/manifest verification,
   real child-process lint reports, release acceptance/idempotence, per-language `unfit`, author
   notification dispatch, total-failure `app.max`, recovery and unchanged original package bytes.
