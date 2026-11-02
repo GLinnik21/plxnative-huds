@@ -52,7 +52,9 @@ the author's original bytes and content hash; an installed HUD still compiles lo
 
 Publication writes `index.json`, `p/<sha256>.plxhud.json`, hashed preview URLs and revocation
 reasons. The repository can remain private during staging. Enabling Pages can expose its output
-even while the repository is private, depending on the account plan; maintainers control deployment.
+even while the repository is private, depending on the account plan. Main deploys only when the
+repository variable `PUBLISH_PAGES` is `true`; a manual run can explicitly request publication.
+With publication disabled, the same byte-verified catalog remains available as a CI artifact.
 
 ## Authoring exercise
 

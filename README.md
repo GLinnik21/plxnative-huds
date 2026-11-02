@@ -8,4 +8,6 @@ languages and the oldest compatible hash-pinned simulator. CI renders native sta
 checks original-byte hashes and prepares a Pages catalog with revocation and compatibility data.
 
 The repository is private during PR12 staging. `IMPLEMENTATION.md` records the remaining acceptance
-evidence. A published Pages deployment may be public even while source access remains private.
+evidence. Pushes always retain the verified catalog as a CI artifact. Set the repository variable
+`PUBLISH_PAGES=true` to deploy main automatically, or dispatch the workflow with `publish=true`
+for an explicit deployment. Pages hosting must first be available for the repository/account plan.
