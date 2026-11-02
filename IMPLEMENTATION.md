@@ -43,3 +43,24 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   TV measurements exist. An empty list fails validation; no placeholder pin can produce a green CI.
 - Real macOS iterations have produced native menu, paused, seeking, Up Next, Skip Intro/Credits and
   bright-footage artifacts. These are iteration evidence; the acceptance matrix remains Linux/Xvfb.
+
+## Native calibration and integration evidence
+
+- Real TV collection completed on app source `9266c34e7`, with the TV lock, synthetic guest/mock,
+  panel on and sound muted. Deployment verified 47 files; the atomic diagnostic wrote 12,276 rows.
+  The TV lock and owned mock/tunnel were released and the temporary private header removed.
+- Linux artifact CI runs `41461558740` (`60410e182`) and `41463540976` (`a43f214b4`) passed native
+  library load and relocation checks. The first archive's 273 manifest-bound files were independently
+  hash-verified; its real corpus matches the TV's fonts and text coverage. Calibration evidence is in
+  `calibration/`, with per-rung margins of 4–9 px and zero added margin on normal TV admission.
+- Stock Draft 2020-12/schema/parser agreement passed over all 17 app corpus packages in a real
+  local simulator iteration. Both seeded HUDs also returned zero findings with measured headroom
+  in that iteration. These do not replace the canonical Linux seeded-PR checks still pending.
+- Deliberately incompatible protocol-fixture app releases exercise archive/manifest verification,
+  real child-process lint reports, release acceptance/idempotence, per-language `unfit`, author
+  notification dispatch, total-failure `app.max`, recovery and unchanged original package bytes.
+  These fixtures are isolated unit-test executables, never published app releases.
+- App exact-tree gates passed on `9266c34e7`: `make check`, `make check-nodef`, and real ARM build.
+  A later Python-only stable-tag provenance review fix has its own failing-then-passing regression
+  and is receiving the final gate before squash landing. The companion registry review returned
+  no findings at `b682a39`.
