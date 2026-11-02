@@ -42,9 +42,13 @@ text-renderer library hashes and type scale match a measured baseline. The profi
 the original measurement and its current host binding; it does not claim the new strings were
 measured on the TV. Changed fonts, renderer libraries or type sizes with a changed corpus require
 fresh native evidence. Local compilation on each TV remains authoritative.
-The `60410e182` and `f1436ba` profiles retain earlier iteration evidence. The active corrected
-bootstrap pin is source `1c9a75db47dfbfddffdae133684698507be263cf`, published by app CI run
-[41487654770](https://github.com/GLinnik21/plx-native/actions/runs/41487654770). Its manifest-hash-
-named profile and host report (`3f9a62fc…`) compare all 12,276 rows directly with the native report,
-without carrying a changed corpus, and produce the same margins above. The pinned bundle's preview
-fixture now sets actual PMS chapter `tag` values for the long-title stress cases.
+The `60410e182`, `f1436ba` and `1c9a75db` profiles retain earlier iteration evidence. The preceding
+`1c9a75db` bundle was published by app CI run
+[41487654770](https://github.com/GLinnik21/plx-native/actions/runs/41487654770), with profile `3f9a62fc…`.
+The active bootstrap pin is source `3bc30f4edd3b392724968f9945dbef002cd646f2`, published by app CI run
+[41515162200](https://github.com/GLinnik21/plx-native/actions/runs/41515162200). Its manifest-hash-
+named profile and host report (`4f88bbe2…`) compare all 12,276 rows directly with the native report,
+without carrying a changed corpus, and produce the same margins above. Only the source binding
+differs from the preceding host report; its metric rows and font hashes are identical. The pinned
+bundle includes both actual PMS chapter `tag` values in the long-title fixture and the shared
+UTF-8 buffer truncation fix.
