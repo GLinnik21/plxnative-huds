@@ -100,7 +100,8 @@ def recheck(root, cache, previous, local=None, notify_repo=None):
         directory = local if local else acquire(pin, cache)
         sim = Simulator(directory, pin, root / pin["calibration"])
         for package in packages(root):
-            if package.sha256 in tombstones or not inside(pin["app_version"], package.metadata.get("app", {})):
+            if (package.sha256 in tombstones or package.metadata["format"] not in pin["formats"]
+                or not inside(pin["app_version"], package.metadata.get("app", {}))):
                 continue
             report = sim.lint(package.path)
             fit = verdict(report, sim.languages)

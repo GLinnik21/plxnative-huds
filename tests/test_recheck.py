@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from recheck import verdict, update, notify, issue
+from recheck import verdict, update, notify, issue, recheck
 from catalog import Invalid, Package
 
 
@@ -39,6 +39,19 @@ class ReleaseCheck(unittest.TestCase):
         self.assertNotIn("app_max",value["packages"]["hash"])
         self.assertEqual(value["packages"]["hash"]["unfit"],
                          [{"from":"0.11.0","langs":["de","en"]},{"from":"0.12.0","langs":[]}])
+
+    def test_future_format_is_not_checked_against_older_unsupported_compilers(self):
+        package=Package(Path("hud.json"),{"id":"com.example.future","format":"1.1"},b"", "hash")
+        pins=[{"app_version":"0.10.0","formats":["1.0"],"calibration":"old.json"},
+              {"app_version":"0.11.0","formats":["1.0","1.1"],"calibration":"new.json"}]
+        with patch("recheck.toolchains",return_value=pins), patch("recheck.revoked",return_value=[]), \
+             patch("recheck.read_json",return_value={package.id:["author"]}), \
+             patch("recheck.packages",return_value=[package]), patch("recheck.Simulator") as simulator:
+            simulator.return_value.languages=["en"]
+            simulator.return_value.lint.return_value={"findings":[]}
+            result=recheck(Path("registry"),Path("cache"),{},local=Path("bundle"))
+        self.assertEqual(simulator.return_value.lint.call_count,1)
+        self.assertEqual(list(result["packages"]["hash"]["checks"]),["0.11.0"])
 
     def test_unknown_language_is_not_silently_dropped(self):
         with self.assertRaises(Invalid):

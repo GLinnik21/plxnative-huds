@@ -39,9 +39,9 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   Published developer simulator run [41473507619](https://github.com/GLinnik21/plx-native/actions/runs/41473507619)
   passed; the bootstrap pin binds its 38,910,181-byte archive, source, manifest and 273 files.
   It is explicitly a prerelease developer utility, not a stable television app release.
-- Registry unit suite: 27 tests pass, including preserved package bytes, deterministic publication,
+- Registry unit suite: 28 tests pass, including preserved package bytes, deterministic publication,
   revocation, oldest-compatible selection, immutable pins/manifest tamper checks, measured per-rung
-  calibration, changed-translation release acceptance, renderer mismatch refusal, language regressions,
+  calibration, future-format filtering, changed-translation release acceptance, renderer mismatch refusal, language regressions,
   non-text regressions, recovery and deduplicated author issues.
 - The bootstrap pin and its source-bound calibration are populated from the published artifact.
   Its 12,276-row corpus compares directly with the real TV report and yields the same 4–9 px margins.
@@ -67,7 +67,7 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
 - App exact-tree gates passed on final head `bed1807376282c79b07d8fac2f76d9e99aeec0c3`:
   `make check`, `make check-nodef`, and real ARM build. The stable-tag provenance review finding
   has a failing-then-passing regression. The companion registry review returned no findings at
-  `b682a39`; final source-bound pin and calibration changes receive another combined-diff review.
+  `b682a39`; final combined-diff review found one future-format filtering bug, fixed with an observed failing-then-passing regression.
 
 | App build-bench case | Before | After |
 |---|---:|---:|
