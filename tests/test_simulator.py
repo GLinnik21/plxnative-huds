@@ -65,6 +65,9 @@ class Pinning(unittest.TestCase):
                 (root / "toolchains.json").write_bytes(canonical({"format":1,"simulators":[value]}))
                 return toolchains(root)
             self.assertEqual(check(pin),[pin])
-            for edit in ({"calibration":"../private"},{"url":"http://127.0.0.1/private"},{"sha256":"unpinned"}):
+            for edit in ({"calibration":"../private"},{"url":"http://127.0.0.1/private"},{"sha256":"unpinned"},
+                         {"url":"https://github.com/GLinnik21/plx-native/releases/download/../../../../other/repo/releases/download/v1/sim.tar.gz"},
+                         {"url":"https://github.com/GLinnik21/plx-native/releases/download/%2e%2e/sim.tar.gz"},
+                         {"url":pin["url"]+"?redirect=elsewhere"}):
                 with self.assertRaises(Invalid):
                     check({**pin,**edit})

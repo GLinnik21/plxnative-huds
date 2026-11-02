@@ -13,6 +13,7 @@ import subprocess
 import tarfile
 import tempfile
 import urllib.request
+from urllib.parse import urlsplit
 
 from catalog import Invalid, read_json, release
 
@@ -39,9 +40,15 @@ def validate_pin(pin: dict):
     calibration = Path(pin.get("calibration", ""))
     if not calibration.parts or calibration.is_absolute() or ".." in calibration.parts:
         raise Invalid("calibration must be a registry-relative path")
-    prefix = "https://github.com/GLinnik21/plx-native/releases/download/"
-    if not pin.get("url", "").startswith(prefix):
-        raise Invalid("simulator must come from the app's GitHub release assets")
+    url = urlsplit(pin.get("url", ""))
+    parts = url.path.split("/")
+    if (url.scheme != "https" or url.netloc != "github.com" or url.query or url.fragment
+        or len(parts) != 7 or parts[:5] != ["","GLinnik21","plx-native","releases","download"]
+        or not all(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*",part) for part in parts[5:])
+        or not parts[-1].endswith(".tar.gz")):
+        # A textual prefix alone accepts /../ and encoded traversal into another repository.
+        # Only the app repository's actual release-asset path may supply executable bytes.
+        raise Invalid("simulator must come from a canonical app GitHub release-asset URL")
 
 
 def toolchains(root: Path) -> list[dict]:

@@ -190,9 +190,14 @@ def generate(root: Path, output: Path, previews: Path, base_url: str, compatibil
     cards = []
     for entry in entries:
         preview = entry["previews"][0]
+        options = ''.join('<option value="' + html.escape(scene["url"],quote=True) + '">'
+                          + html.escape(scene["state"].replace("-"," ") + " · " + scene["lang"]) + '</option>'
+                          for scene in entry["previews"])
+        select = '<label>Preview state <select onchange="const card=this.closest(\'article\');card.querySelector(\'img\').src=this.value;card.querySelector(\'a.preview\').href=this.value">' + options + '</select></label>'
         cards.append(f'<article><h2>{html.escape(entry["name"])}</h2><p>{html.escape(entry["id"])} · {html.escape(entry["version"])}</p>'
-                     f'<img loading="lazy" alt="{html.escape(preview["state"], quote=True)}" src="{html.escape(preview["url"], quote=True)}">'
+                     + select + f'<a class="preview" href="{html.escape(preview["url"], quote=True)}">'
+                     f'<img width="1920" height="1080" loading="lazy" alt="Player HUD preview" src="{html.escape(preview["url"], quote=True)}"></a>'
                      f'<p><a href="{html.escape(entry["url"], quote=True)}">Download HUD</a></p></article>')
-    page = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PlxNative HUD registry</title><style>body{max-width:1100px;margin:40px auto;padding:20px;background:#111;color:#eee;font:18px/1.5 system-ui}img{width:100%}a{color:#9cf}article{margin:40px 0}</style><h1>PlxNative HUD registry</h1><p>Reviewed, declarative player HUD packages.</p>' + ''.join(cards) + '<p><a href="CREDITS.md">Preview media credits</a> · <a href="index.json">Catalog JSON</a></p></html>'
+    page = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PlxNative HUD registry</title><style>body{max-width:1100px;margin:40px auto;padding:20px;background:#111;color:#eee;font:18px/1.5 system-ui}img{width:100%;height:auto;margin-top:16px}a{color:#9cf}select{margin-left:8px;padding:8px;max-width:100%;background:#222;color:#eee;border:1px solid #777}article{margin:40px 0}</style><h1>PlxNative HUD registry</h1><p>Reviewed, declarative player HUD packages.</p>' + ''.join(cards) + '<p><a href="CREDITS.md">Preview media credits</a> · <a href="index.json">Catalog JSON</a></p></html>'
     (output / "index.html").write_text(page, encoding="utf-8")
     return index
