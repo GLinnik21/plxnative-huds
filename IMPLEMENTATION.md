@@ -20,7 +20,7 @@ Completion requires evidence for every item below, not merely a green Python sui
   preview URLs and hashes, and revocation reasons. Every published hash is checked.
 - [ ] GitHub Pages publication is exercised end-to-end; disabling publication still produces
   the same verifiable catalog artifact for private staging.
-- [ ] Authoring kit includes AGENTS.md, llms.txt, AUTHORING.md, examples, schema and lint guidance.
+- [x] Authoring kit includes AGENTS.md, llms.txt, AUTHORING.md, examples, schema and lint guidance.
   An authoring exercise succeeds using only the kit, schema, example and at most two lint runs.
 - [ ] An app release sends repository_dispatch; weekly re-lint is the fallback. Compatibility
   data records per-language unfit results, caps app.max after total failure, and files a deduplicated
@@ -73,7 +73,13 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   `fix/hud-authoring-publication` (`a50307d32`) fixes that delivery gap and updates stale
   verification notes. It passed `make check` and `make check-nodef` on a clean committed tree,
   17 toolkit tests, 80 workflow checks, before/after build-bench and a no-findings review. It also
-  adds a manual scoped-secret probe without publishing an app release.
+  adds a manual scoped-secret probe without publishing an app release. App [PR #1209](https://github.com/GLinnik21/plx-native/pull/1209)
+  squash-merged as `1c9a75db47dfbfddffdae133684698507be263cf` (owner merge observed while the
+  landing gate waited; the reviewed head's checks passed). App Pages run
+  [41487108486](https://github.com/GLinnik21/plx-native/actions/runs/41487108486) deployed it;
+  all 27 authoring URLs were independently fetched from `https://plxnative.com/hud/` and matched
+  source bytes. Corrected toolkit publication run
+  [41487654770](https://github.com/GLinnik21/plx-native/actions/runs/41487654770) is in progress.
 - Repository visibility and GitHub's combined Actions create/approve-PR setting remain unchanged
   pending owner approval. Pages is explicitly opt-in; private pushes retain the catalog artifact.
 - Deliberately incompatible protocol-fixture app releases exercise archive/manifest verification,
