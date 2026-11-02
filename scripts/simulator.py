@@ -167,6 +167,10 @@ class Simulator:
                 raise Invalid("text calibration margins must be finite and nonnegative")
             if profile.get("font_hashes") != self.manifest.get("font_hashes"):
                 raise Invalid("text calibration uses different font bytes")
+            if profile.get("renderer_hashes"):
+                from calibrate import renderer_hashes
+                if profile["renderer_hashes"] != renderer_hashes(self.manifest):
+                    raise Invalid("text calibration uses different renderer libraries")
             if set(profile.get("by_rung", {})) != set(info["rungs"]):
                 raise Invalid("text calibration omits a supported type rung")
         self.info = info

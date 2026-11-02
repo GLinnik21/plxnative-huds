@@ -15,7 +15,8 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
-from catalog import canonical, packages, read_json
+from catalog import Invalid, canonical, packages, read_json
+from calibrate import RENDERER_FILES
 from releases import accept
 from recheck import recheck
 
@@ -58,11 +59,16 @@ class ReleasePipeline(unittest.TestCase):
                  'if sys.argv[1]=="--hud-info":\n print(json.dumps(info))\nelse:\n'
                  ' print(json.dumps({"findings":findings,"costs":[]}))\n sys.exit(bool(findings))\n')
         binary=stage/'bin/plxnative-sim'; binary.write_text(program); binary.chmod(0o755)
-        host={**self.tv,'source_sha':source[:9],'app_version':version}
+        host={**self.tv,'source_sha':source[:9],'app_version':version,
+              'metrics':[{**row,'text':('Ein deutlich längerer deutscher Text' if mode=='translation' and row['lang']=='de' else row['text'])} for row in self.tv['metrics']]}
         (stage/'text-metrics.json').write_bytes(canonical(host))
+        renderer_files={}
+        for name in RENDERER_FILES:
+            path=stage/name; path.parent.mkdir(parents=True,exist_ok=True); path.write_bytes(b'Protocol fixture renderer identity')
+            renderer_files[name]=hashlib.sha256(path.read_bytes()).hexdigest()
         manifest={'protocol':1,'app_version':version,'reported_version':version,'development':False,
                   'source_sha':source,'formats':['1.0'],'font_hashes':self.tv['font_hashes'],
-                  'files':{'bin/plxnative-sim':hashlib.sha256(binary.read_bytes()).hexdigest(),
+                  'files':{**renderer_files,'bin/plxnative-sim':hashlib.sha256(binary.read_bytes()).hexdigest(),
                            'text-metrics.json':hashlib.sha256((stage/'text-metrics.json').read_bytes()).hexdigest()}}
         (stage/'bundle.json').write_bytes(canonical(manifest))
         archive=self.root/(version+'.tar.gz')
@@ -82,6 +88,10 @@ class ReleasePipeline(unittest.TestCase):
         original_pin=read_json(self.root/'toolchains.json')['simulators'][0]
         self.assertTrue(accept(self.root,self.cache,incompatible))
         self.assertFalse(accept(self.root,self.cache,incompatible),'repeat dispatch is idempotent')
+        carried=read_json(self.root/read_json(self.root/'toolchains.json')['simulators'][1]['calibration'])
+        self.assertEqual(carried['measured_host_source_sha'],'a'*9)
+        self.assertEqual(carried['host_source_sha'],'b'*9)
+        self.assertEqual(carried['carried_from'],'a'*9)
         with patch('recheck.notify') as notify:
             result=recheck(self.root,self.cache,{'format':1,'packages':{}},notify_repo='example/registry')
         entry=result['packages'][self.package.sha256]
@@ -91,6 +101,16 @@ class ReleasePipeline(unittest.TestCase):
         notify.assert_called_once()
         self.assertEqual(notify.call_args.args[3]['langs'],['de'])
         self.assertEqual(self.package.path.read_bytes(),self.original)
+
+    def test_changed_text_cannot_invent_headroom_without_matching_renderer(self):
+        accept(self.root,self.cache,self.release('0.10.0','a'*40,'clean'))
+        baseline=read_json(self.root/'toolchains.json')['simulators'][0]
+        path=self.root/baseline['calibration']; profile=read_json(path)
+        profile['renderer_hashes'][RENDERER_FILES[0]]='0'*64
+        path.write_bytes(canonical(profile))
+        with self.assertRaisesRegex(Invalid,'matching measured renderer'):
+            accept(self.root,self.cache,self.release('0.11.0','b'*40,'translation'))
+        self.assertEqual(len(read_json(self.root/'toolchains.json')['simulators']),1)
 
     def test_nontext_failure_caps_at_last_pass_then_a_repaired_release_restores_range(self):
         for version,source,mode in [('0.10.0','a'*40,'clean'),('0.11.0','b'*40,'invariant')]:

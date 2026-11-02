@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 import subprocess
 from urllib.request import urlopen
-from calibrate import calibrate
+from calibrate import release_profile
 from catalog import Invalid, canonical, read_json, release
-from simulator import acquire, toolchains, validate_pin
+from simulator import acquire, toolchains, validate_pin, verify_bundle
 
 APP = "GLinnik21/plx-native"
 ARCHIVE = "plxnative-hud-simulator-linux-x86_64.tar.gz"
@@ -40,7 +40,8 @@ def accept(root, cache, pin):
     directory = acquire(pin, cache)
     host = read_json(directory / "text-metrics.json")
     television = read_json(root / "calibration/tv-metrics.json")
-    profile = calibrate(host, television)
+    profiles = [read_json(root / item["calibration"]) for item in sorted(previous, key=lambda item: release(item["app_version"]))]
+    profile = release_profile(host, television, verify_bundle(directory, pin), profiles)
     import hashlib
     profile["evidence"] = {"host": hashlib.sha256((directory / "text-metrics.json").read_bytes()).hexdigest(),
                            "tv": hashlib.sha256((root / "calibration/tv-metrics.json").read_bytes()).hexdigest()}

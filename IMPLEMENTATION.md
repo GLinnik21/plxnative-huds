@@ -1,7 +1,8 @@
 # PR12 acceptance record
 
 This registry remains private before release. Test publication is authorized by the owner.
-The app implementation is developed separately on `feat/hud-registry-pr12` in `plx-native`.
+The app implementation landed in [plx-native PR #1206](https://github.com/GLinnik21/plx-native/pull/1206)
+as squash `f1436ba4746c477537144276ff928840f0be7566`.
 
 Completion requires evidence for every item below, not merely a green Python suite:
 
@@ -34,13 +35,16 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
 
 ## Implementation checkpoints
 
-- App instrument/bundle implementation: `plx-native` branch `feat/hud-registry-pr12`, commits
-  `39f1dffd5` and `60410e182`. Before benchmark recorded; final gates/after benchmark pending.
-- Registry unit suite: 19 tests pass, including preserved package bytes, deterministic publication,
+- App PR #1206 passed all 21 reported CI checks (20 passed, one expected skip) and squash-landed.
+  Published developer simulator run [41473507619](https://github.com/GLinnik21/plx-native/actions/runs/41473507619)
+  passed; the bootstrap pin binds its 38,910,181-byte archive, source, manifest and 273 files.
+  It is explicitly a prerelease developer utility, not a stable television app release.
+- Registry unit suite: 27 tests pass, including preserved package bytes, deterministic publication,
   revocation, oldest-compatible selection, immutable pins/manifest tamper checks, measured per-rung
-  calibration, language regressions, non-text regressions, recovery and deduplicated author issues.
-- The simulator pin list intentionally remains empty until the actual Linux artifact and matching
-  TV measurements exist. An empty list fails validation; no placeholder pin can produce a green CI.
+  calibration, changed-translation release acceptance, renderer mismatch refusal, language regressions,
+  non-text regressions, recovery and deduplicated author issues.
+- The bootstrap pin and its source-bound calibration are populated from the published artifact.
+  Its 12,276-row corpus compares directly with the real TV report and yields the same 4–9 px margins.
 - Real macOS iterations have produced native menu, paused, seeking, Up Next, Skip Intro/Credits and
   bright-footage artifacts. These are iteration evidence; the acceptance matrix remains Linux/Xvfb.
 
@@ -60,7 +64,21 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   real child-process lint reports, release acceptance/idempotence, per-language `unfit`, author
   notification dispatch, total-failure `app.max`, recovery and unchanged original package bytes.
   These fixtures are isolated unit-test executables, never published app releases.
-- App exact-tree gates passed on `9266c34e7`: `make check`, `make check-nodef`, and real ARM build.
-  A later Python-only stable-tag provenance review fix has its own failing-then-passing regression
-  and is receiving the final gate before squash landing. The companion registry review returned
-  no findings at `b682a39`.
+- App exact-tree gates passed on final head `bed1807376282c79b07d8fac2f76d9e99aeec0c3`:
+  `make check`, `make check-nodef`, and real ARM build. The stable-tag provenance review finding
+  has a failing-then-passing regression. The companion registry review returned no findings at
+  `b682a39`; final source-bound pin and calibration changes receive another combined-diff review.
+
+| App build-bench case | Before | After |
+|---|---:|---:|
+| No-op | 0.2 s | 0.2 s |
+| Leaf edit | 30.4 s | 40.8 s |
+| Hub edit | 16.9 s | 28.3 s |
+| Host tests | 58.1 s | 60.4 s |
+| ARM benchmark | skipped, no archive | skipped, no archive |
+
+Before source `f2449cc55`; after source `60410e182` contains all final Rust changes (later edits
+were Python/workflow-only). After-run machine load was 12.46–12.85 on ten cores: noisy timings,
+not evidence of a performance regression. The rebuilt sets stayed 27/169 leaf and 7/169 hub.
+Tests were 11,501 passed before and 11,506 after, zero failures, 99 ignored in both benchmark runs.
+The separate final ARM link passed; it is not an ARM timing measurement.

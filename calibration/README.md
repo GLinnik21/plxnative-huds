@@ -36,7 +36,13 @@ its own native widths. These measurements describe this renderer/font corpus; in
 continue to compile locally on each TV.
 
 Every accepted simulator pin has a profile naming its exact host source and font bytes. The
-release job compares a new host corpus with this TV evidence and refuses changed/missing text or
-fonts instead of inventing a margin. New translations/fonts require a fresh native corpus.
+release job compares an unchanged corpus directly with this TV evidence. When translations or
+languages change, it carries the empirical per-rung margins only while the font hashes, native
+text-renderer library hashes and type scale match a measured baseline. The profile records both
+the original measurement and its current host binding; it does not claim the new strings were
+measured on the TV. Changed fonts, renderer libraries or type sizes with a changed corpus require
+fresh native evidence. Local compilation on each TV remains authoritative.
 The initial `60410e182` profile is iteration evidence; the final bootstrap pin gets its own
-source-bound profile from the published CI artifact before the seeded PR can pass.
+source-bound profile from published CI run [41473507619](https://github.com/GLinnik21/plx-native/actions/runs/41473507619),
+source `f1436ba4746c477537144276ff928840f0be7566`. The manifest-hash-named profile and host report
+record the final bootstrap pin; its complete corpus gives the same table above.

@@ -47,6 +47,57 @@ def calibrate(host, television):
             "host_source_sha": host["source_sha"], "tv_source_sha": television["source_sha"]}
 
 
+# These are the native text stack shipped by the app bundle, including its caption renderer.
+RENDERER_FILES = ("lib/libSDL2_ttf-2.0.so.0", "lib/libfreetype.so.6",
+                  "lib/libharfbuzz.so.0", "pkg/libass-plx-host.so.0")
+
+
+def renderer_hashes(manifest):
+    files = manifest["files"]
+    if any(name not in files for name in RENDERER_FILES):
+        raise Invalid("simulator manifest omits a text renderer library")
+    return {name: files[name] for name in RENDERER_FILES}
+
+
+def type_sizes(report):
+    result = {}
+    for row in rows(report).values():
+        rung, size = row["rung"], row["size"]
+        if isinstance(size, bool) or not isinstance(size, (int, float)) or not math.isfinite(size) or size <= 0:
+            raise Invalid("invalid text corpus type size")
+        if rung in result and result[rung] != size:
+            raise Invalid("a type rung has inconsistent sizes")
+        result[rung] = size
+    return result
+
+
+def release_profile(host, television, manifest, previous):
+    renderers = renderer_hashes(manifest)
+    sizes = type_sizes(host)
+    try:
+        profile = calibrate(host, television)
+    except Invalid as mismatch:
+        # The measured margin is empirical headroom for a renderer and type scale. New
+        # translations must reach lint, even though the TV evidence predates those strings.
+        # Never describe a carried margin as a new native measurement.
+        basis = next((p for p in reversed(previous)
+                      if p.get("font_hashes") == host["font_hashes"]
+                      and p.get("renderer_hashes") == renderers
+                      and p.get("type_sizes") == sizes), None)
+        if basis is None:
+            raise Invalid("changed corpus requires a matching measured renderer/font/type-scale baseline or fresh TV measurements") from mismatch
+        profile = {**basis, "host_source_sha": host["source_sha"],
+                   "measured_host_source_sha": basis.get("measured_host_source_sha", basis["host_source_sha"]),
+                   "carried_from": basis["host_source_sha"],
+                   "current_languages": sorted({r["lang"] for r in rows(host).values()}),
+                   "current_corpus_rows": len(rows(host))}
+        # Keep the original measured-host hash when rebinding current-host evidence below.
+        profile["measured_host_evidence"] = basis.get("measured_host_evidence", basis["evidence"]["host"])
+    profile["renderer_hashes"] = renderers
+    profile["type_sizes"] = sizes
+    return profile
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--host", type=Path, required=True)

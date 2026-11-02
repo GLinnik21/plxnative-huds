@@ -1,1 +1,18 @@
-{"format":1,"simulators":[]}
+{
+  "format": 1,
+  "simulators": [
+    {
+      "app_version": "0.10.0",
+      "bytes": 38910181,
+      "calibration": "calibration/015ee91ffae109a6d24317ed9317f63441611029c3e1e054914c43b862c53a46.json",
+      "development": true,
+      "formats": [
+        "1.0"
+      ],
+      "manifest_sha256": "015ee91ffae109a6d24317ed9317f63441611029c3e1e054914c43b862c53a46",
+      "sha256": "fdd7faa355d896b49a62db71fd353fb141f1bc02f4a83b61aa5830a133f14085",
+      "source_sha": "f1436ba4746c477537144276ff928840f0be7566",
+      "url": "https://github.com/GLinnik21/plx-native/releases/download/hud-simulator-f1436ba4746c477537144276ff928840f0be7566/plxnative-hud-simulator-linux-x86_64.tar.gz"
+    }
+  ]
+}
