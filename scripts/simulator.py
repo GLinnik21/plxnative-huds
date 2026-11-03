@@ -274,10 +274,16 @@ class Simulator:
             raise Invalid("native packed manifest changed during SDK selection")
         return Package(output, metadata, content, digest, self.pin)
 
+    def read_package(self, path: Path) -> Package:
+        report = self.run("--hud-inspect", path, findings=True)
+        content, digest = self.bind_report(report, path)
+        if report["findings"] or not isinstance(report.get("manifest"), dict):
+            raise Invalid("native inspection refused the package")
+        return Package(path, report["manifest"], content, digest, self.pin)
+
     def inspect(self, package: Package):
-        report = self.run("--hud-inspect", package.path, findings=True)
-        content, digest = self.bind_report(report, package.path)
-        if (report["findings"] or digest != package.sha256 or content != package.content
-            or report.get("manifest") != package.metadata):
+        actual = self.read_package(package.path)
+        if (actual.sha256 != package.sha256 or actual.content != package.content
+            or actual.metadata != package.metadata or actual.pin != package.pin):
             raise Invalid("native inspected package differs from its validated snapshot")
-        return report
+        return actual

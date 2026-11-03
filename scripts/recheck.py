@@ -10,8 +10,9 @@ import re
 import subprocess
 import sys
 from urllib.request import build_opener
-from catalog import Invalid, Package, canonical, oldest, packages, public_origin, read_json, release, require_sources, revoked, sources, supports, unique_object
-from simulator import SecureRedirect, Simulator, acquire, toolchains
+from catalog import Invalid, canonical, format_pair, packages, public_origin, read_json, release, revoked, supports, unique_object
+from previews import verify_provenance
+from simulator import SecureRedirect, Simulator, acquire, toolchains, validate_pin
 
 TEXT_CODES = {"HUD-E0601", "HUD-W0602"}
 
@@ -94,7 +95,15 @@ def notify(repo, package, version, result, contacts=()):
     subprocess.run(["gh", "issue", "create", "--repo", repo, "--title", title, "--body-file", "-"], input=body, text=True, check=True)
 
 
-def published_packages(root, cache, pins, base_url, local=None):
+def original_sdk(pin, cache, local=None):
+    """Authenticate the package's recorded SDK independently of today's active pins."""
+    if not isinstance(pin, dict):
+        raise Invalid("package omits its original SDK provenance")
+    validate_pin(pin)
+    return Simulator(local or acquire(pin, cache), pin)
+
+
+def published_packages(root, cache, base_url, local=None):
     """Read the published artifacts verbatim. A release recheck never rebuilds a HUD."""
     public_origin(base_url)
     origin = base_url.rstrip("/")
@@ -114,23 +123,19 @@ def published_packages(root, cache, pins, base_url, local=None):
     if len(entries) != len(index["entries"]):
         raise Invalid("published catalog has duplicate package IDs")
     tombstones = {item["sha256"] for item in revoked(root)}
+    tombstones.update(item["sha256"] for item in index.get("revoked", []))
     by_id = {}
-    for source in sources(root):
-        entry = entries.get(source.id)
-        if entry is None:
-            # Publication omits revoked packages. There is no archive to recheck for those IDs.
-            continue
-        if (entry.get("version") != source.metadata["version"]
-            or entry.get("package_format") != source.metadata["package_format"]
-            or entry.get("hud_format") != source.metadata["hud"]["format"]):
-            raise Invalid("published package differs from the current source release")
+    for entry in entries.values():
         digest = entry.get("sha256", "")
         if not isinstance(digest, str) or not re.fullmatch("[0-9a-f]{64}", digest):
             raise Invalid("published catalog has an invalid package hash")
         if digest in tombstones:
             continue
-        pin = oldest(source, pins)
-        maximum = pin["limits"]["package"][source.metadata["package_format"]]["artifact_bytes"]
+        sim = original_sdk(entry.get("sdk"), cache, local)
+        declared = {"package": entry.get("package_format"), "hud": entry.get("hud_format")}
+        if declared not in sim.pin["supported_formats"]:
+            raise Invalid("published package format differs from its original SDK provenance")
+        maximum = sim.pin["limits"]["package"][declared["package"]]["artifact_bytes"]
         size = entry.get("bytes")
         if type(size) is not int or not 0 < size <= maximum:
             raise Invalid("published package size is outside its declared profile")
@@ -147,9 +152,14 @@ def published_packages(root, cache, pins, base_url, local=None):
         if path.is_symlink():
             raise Invalid("published package cache cannot contain a symlink")
         path.write_bytes(content)
-        package = Package(path, source.metadata, content, digest, pin)
-        sim = Simulator(local or acquire(pin, cache), pin, root / pin["calibration"])
-        sim.inspect(package)
+        package = sim.read_package(path)
+        if (package.sha256 != digest or package.content != content
+            or format_pair(package.metadata) != declared or not supports(package, sim.pin)
+            or any(package.metadata.get(key) != entry.get(key) for key in ("id", "version", "name", "author", "license"))):
+            raise Invalid("published catalog metadata differs from its authenticated archive")
+        proof = json.loads(fetch(origin + "/previews/" + digest + "/manifest.json", 2 * 1024 * 1024),
+                           object_pairs_hook=unique_object)
+        verify_provenance(sim, package, proof, published=True)
         by_id[package.id] = package
     return list(by_id.values())
 
@@ -160,13 +170,15 @@ def recheck(root, cache, previous, local=None, notify_repo=None, snapshot=None,
     tombstones = {item["sha256"] for item in revoked(root)}
     owners = read_json(root / "maintainers.json")
     pins = sorted(toolchains(root), key=lambda pin: release(pin["app_version"]))
-    candidates = packages(snapshot) if snapshot else published_packages(root, cache, pins, base_url, local)
+    candidates = packages(snapshot) if snapshot else published_packages(root, cache, base_url, local)
     if snapshot:
-        require_sources(root, candidates)
         for package in candidates:
-            pin = oldest(package, pins)
-            sim = Simulator(local or acquire(pin, cache), pin, root / pin["calibration"])
+            if package.sha256 in tombstones:
+                continue
+            sim = original_sdk(package.pin, cache, local)
             sim.inspect(package)
+            if not supports(package, sim.pin):
+                raise Invalid("package is outside its original SDK's supported format or app range")
     for pin in pins:
         directory = local if local else acquire(pin, cache)
         sim = Simulator(directory, pin, root / pin["calibration"])
@@ -177,7 +189,7 @@ def recheck(root, cache, previous, local=None, notify_repo=None, snapshot=None,
             fit = verdict(report, sim.languages)
             result = update(result, package.sha256, pin["app_version"], fit, sim.languages)
             if fit["langs"] and notify_repo:
-                notify(notify_repo, package, pin["app_version"], fit, owners[package.id])
+                notify(notify_repo, package, pin["app_version"], fit, owners.get(package.id, ()))
     return result
 
 

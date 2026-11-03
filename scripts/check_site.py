@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 from urllib.parse import urlsplit
+from simulator import validate_pin
 
 
 def check(root):
@@ -15,6 +16,9 @@ def check(root):
         data = path.read_bytes()
         assert len(data) == entry["bytes"] and hashlib.sha256(data).hexdigest() == entry["sha256"]
         assert urlsplit(entry["url"]).path.endswith("/p/" + path.name)
+        validate_pin(entry["sdk"])
+        proof = json.loads((root / "previews" / entry["sha256"] / "manifest.json").read_text())
+        assert proof["package_sha256"] == entry["sha256"] and proof["sdk"] == entry["sdk"]
         for preview in entry["previews"]:
             image = root / "previews" / entry["sha256"] / preview["file"]
             assert hashlib.sha256(image.read_bytes()).hexdigest() == preview["sha256"]

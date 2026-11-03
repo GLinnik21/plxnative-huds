@@ -49,9 +49,10 @@ class ReleasePipeline(unittest.TestCase):
         (self.calibration/'tv-metrics.json').write_bytes(canonical(self.tv))
         (self.root/'toolchains.json').write_bytes(canonical({'format':1,'simulators':[]}))
 
-    def release(self,version,source,mode):
+    def release(self,version,source,mode,development=False):
         stage=self.root/('bundle-'+version); (stage/'bin').mkdir(parents=True)
-        info={'protocol':1,'app_version':version,'source_sha':source[:9],'supported_formats':FORMATS,'schemas':SCHEMAS,'limits':LIMITS,
+        reported=version+'-dev' if development else version
+        info={'protocol':1,'app_version':reported,'source_sha':source[:9],'supported_formats':FORMATS,'schemas':SCHEMAS,'limits':LIMITS,
               'languages':['en','de'],'rungs':{'BODY':28}}
         findings=[]
         if mode=='translation':
@@ -62,11 +63,13 @@ class ReleasePipeline(unittest.TestCase):
         program=('#!/usr/bin/env python3\nimport hashlib,json,sys\nfrom pathlib import Path\n'
                  f'info=json.loads({json.dumps(info)!r})\n'
                  f'findings=json.loads({json.dumps(findings)!r})\n'
+                 f'inspect_findings=json.loads({json.dumps(findings if mode == "invariant" else [])!r})\n'
                  'if sys.argv[1]=="--hud-info":\n print(json.dumps(info))\nelse:\n'
                  ' data=Path(sys.argv[2]).read_bytes()\n'
                  ' digest=hashlib.sha256(data).hexdigest()\n'
                  ' if sys.argv[1]=="--hud-inspect":\n'
-                 '  print(json.dumps({"protocol":1,"package_sha256":digest,"manifest":json.loads(data)["protocol_fixture_manifest"],"findings":[]}))\n'
+                 '  print(json.dumps({"protocol":1,"package_sha256":digest,"manifest":json.loads(data)["protocol_fixture_manifest"],"findings":inspect_findings}))\n'
+                 '  sys.exit(bool(inspect_findings))\n'
                  ' else:\n'
                  '  print(json.dumps({"protocol":1,"package_sha256":digest,"findings":findings,"costs":[]}))\n'
                  '  sys.exit(bool(findings))\n')
@@ -78,7 +81,7 @@ class ReleasePipeline(unittest.TestCase):
         for name in RENDERER_FILES:
             path=stage/name; path.parent.mkdir(parents=True,exist_ok=True); path.write_bytes(b'Protocol fixture renderer identity')
             renderer_files[name]=hashlib.sha256(path.read_bytes()).hexdigest()
-        manifest={'protocol':1,'app_version':version,'reported_version':version,'development':False,
+        manifest={'protocol':1,'app_version':version,'reported_version':reported,'development':development,
                   'source_sha':source,'supported_formats':FORMATS,'schemas':SCHEMAS,'limits':LIMITS,'font_hashes':self.tv['font_hashes'],
                   'files':{**renderer_files,'bin/plxnative-sim':hashlib.sha256(binary.read_bytes()).hexdigest(),
                            'text-metrics.json':hashlib.sha256((stage/'text-metrics.json').read_bytes()).hexdigest()}}
@@ -89,15 +92,38 @@ class ReleasePipeline(unittest.TestCase):
                 if path.is_file(): tar.add(path,arcname=str(path.relative_to(stage)))
         digest=hashlib.sha256(archive.read_bytes()).hexdigest()
         (self.cache/(digest+'.tar.gz')).write_bytes(archive.read_bytes())
-        return {'protocol':1,'app_version':version,'source_sha':source,'supported_formats':FORMATS,'schemas':SCHEMAS,'limits':LIMITS,'development':False,
+        return {'protocol':1,'app_version':version,'source_sha':source,'supported_formats':FORMATS,'schemas':SCHEMAS,'limits':LIMITS,'development':development,
                 'sha256':digest,'manifest_sha256':hashlib.sha256((stage/'bundle.json').read_bytes()).hexdigest(),
                 'bytes':archive.stat().st_size,'url':'https://github.com/GLinnik21/plx-native/releases/download/v'+version+'/sim.tar.gz'}
+
+    def test_original_sdk_authenticates_before_incompatible_current_sdk_reports_failure(self):
+        original=self.release('0.10.0','a'*40,'clean',development=True)
+        original['calibration']='calibration/original.json'
+        package=Package(self.package.path,self.package.metadata,self.original,self.package.sha256,original)
+        write_packages(self.snapshot,[package])
+        accept(self.root,self.cache,self.release('0.11.0','b'*40,'invariant'))
+        result=recheck(self.root,self.cache,{'format':1,'packages':{}},snapshot=self.snapshot)
+        failure=result['packages'][package.sha256]['checks']['0.11.0']
+        self.assertTrue(failure['nontext'])
+        self.assertEqual(failure['langs'],['de','en'])
+        self.assertEqual(package.path.read_bytes(),self.original)
+
+    def test_original_sdk_identity_tampering_is_refused_before_new_lint(self):
+        original=self.release('0.10.0','a'*40,'clean',development=True)
+        original.update(calibration='calibration/original.json',manifest_sha256='0'*64)
+        package=Package(self.package.path,self.package.metadata,self.original,self.package.sha256,original)
+        write_packages(self.snapshot,[package])
+        accept(self.root,self.cache,self.release('0.11.0','b'*40,'clean'))
+        with self.assertRaisesRegex(Invalid,'manifest'):
+            recheck(self.root,self.cache,{'format':1,'packages':{}},snapshot=self.snapshot)
 
     def test_release_translation_regression_notifies_author_without_rewriting_pack(self):
         baseline=self.release('0.10.0','a'*40,'clean')
         incompatible=self.release('0.11.0','b'*40,'translation')
         self.assertTrue(accept(self.root,self.cache,baseline))
         original_pin=read_json(self.root/'toolchains.json')['simulators'][0]
+        self.package=Package(self.package.path,self.package.metadata,self.original,self.package.sha256,original_pin)
+        write_packages(self.snapshot,[self.package])
         self.assertTrue(accept(self.root,self.cache,incompatible))
         self.assertFalse(accept(self.root,self.cache,incompatible),'repeat dispatch is idempotent')
         carried=read_json(self.root/read_json(self.root/'toolchains.json')['simulators'][1]['calibration'])
@@ -127,6 +153,9 @@ class ReleasePipeline(unittest.TestCase):
     def test_nontext_failure_caps_at_last_pass_then_a_repaired_release_restores_range(self):
         for version,source,mode in [('0.10.0','a'*40,'clean'),('0.11.0','b'*40,'invariant')]:
             accept(self.root,self.cache,self.release(version,source,mode))
+        original_pin=read_json(self.root/'toolchains.json')['simulators'][0]
+        self.package=Package(self.package.path,self.package.metadata,self.original,self.package.sha256,original_pin)
+        write_packages(self.snapshot,[self.package])
         result=recheck(self.root,self.cache,{'format':1,'packages':{}},snapshot=self.snapshot)
         entry=result['packages'][self.package.sha256]
         self.assertEqual(entry['app_max'],'0.10.0')

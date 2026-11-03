@@ -84,9 +84,13 @@ Optional `app.min` and `app.max` are exact X.Y.Z app releases. SDK pins bind sou
 manifest, supported version pairs, schemas and limits. Published stable SDK pins are immutable.
 Development pins can advance to newly published, source-bound development artifacts.
 
-Release dispatches and the weekly backstop re-lint the exact published `.plxhud` bytes. They record
-per-language `unfit` transitions and deduplicated author issues. Total or non-text failures cap
-the catalog at the last passing app, and later successful releases restore compatibility.
+Release dispatches and the weekly backstop enumerate the published catalog and re-lint its exact
+`.plxhud` bytes. Each published entry and preview proof retain the original SDK pin. That SDK
+authenticates the archive and its authored metadata before later SDKs evaluate compatibility.
+Source edits and removals can proceed while a published version is still being checked.
+The checks record per-language `unfit` transitions and deduplicated author issues. Total or non-text
+failures cap the catalog at the last passing app, and later successful releases restore compatibility.
+Authored app bounds come from the archive, so catalog compatibility ceilings allow future rechecks.
 The TV retains its own fit and cost checks when selecting a package.
 
 Publication writes `index.json`, `p/<sha256>.plxhud`, hashed previews and revocation reasons.

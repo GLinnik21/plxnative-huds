@@ -22,16 +22,20 @@ def expected(sim, package):
     return [scene["name"] for scene in json.loads(process.stdout)]
 
 
-def verify(sim, package, directory):
+def verify_provenance(sim, package, manifest, *, published=False):
+    if (manifest.get("package_sha256") != package.sha256 or not manifest.get("complete")
+        or manifest.get("simulator") != sim.info
+        or (published or "sdk" in manifest) and manifest.get("sdk") != package.pin):
+        raise Invalid("preview provenance differs from the package's original SDK")
+
+
+def verify(sim, package, directory, *, published=False):
     manifest = read_json(directory / "manifest.json")
+    verify_provenance(sim, package, manifest, published=published)
     names = expected(sim, package)
     actual = [scene["state"] for scene in manifest.get("scenes", [])]
-    if (manifest.get("package_sha256") != package.sha256 or not manifest.get("complete")
-        or manifest.get("required") != names or sorted(actual) != sorted(names) or len(set(actual)) != len(actual)):
+    if manifest.get("required") != names or sorted(actual) != sorted(names) or len(set(actual)) != len(actual):
         raise Invalid(f"incomplete preview state matrix: {package.id}")
-    provenance = manifest.get("simulator", {})
-    if provenance != sim.info:
-        raise Invalid("preview was rendered with a different simulator than the oldest compatible pin")
     for scene in manifest["scenes"]:
         name = scene["file"]
         if Path(name).name != name or not name.endswith(".png"):
@@ -94,7 +98,7 @@ def published(sim, package, directory, base_url):
                 if Path(name).name != name or not name.endswith(".png"):
                     raise Invalid("unsafe published preview filename")
                 fetch(name,32*1024*1024)
-            verify(sim,package,stage)
+            verify(sim,package,stage,published=True)
         except (Invalid,OSError,ValueError,KeyError,URLError):
             return False
         if directory.exists():

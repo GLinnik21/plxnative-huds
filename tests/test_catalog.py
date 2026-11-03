@@ -8,6 +8,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import catalog
+from check_site import check
 from test_bundles import metadata, pin
 
 
@@ -95,6 +96,15 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual((a / "p" / (package.sha256+".plxhud")).read_bytes(), package.content)
         self.assertEqual(first["entries"][0]["sha256"], hashlib.sha256(package.content).hexdigest())
         self.assertEqual(first["entries"][0]["bytes"], len(package.content))
+        self.assertEqual(first["entries"][0]["sdk"], package.pin)
+        proof = catalog.read_json(a / "previews" / package.sha256 / "manifest.json")
+        self.assertEqual(proof["sdk"], package.pin)
+        (a / "CREDITS.md").write_text("Protocol fixture\n")
+        self.assertEqual(check(a), 1)
+        proof["sdk"] = {**package.pin, "sha256": "0" * 64}
+        (a / "previews" / package.sha256 / "manifest.json").write_bytes(catalog.canonical(proof))
+        with self.assertRaises(AssertionError):
+            check(a)
 
     def test_bad_preview_hash_or_path_never_publishes_an_index(self):
         package = self.package()

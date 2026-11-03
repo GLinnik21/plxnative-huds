@@ -14,7 +14,8 @@ Keep the SDK fixture corpus and measured text calibration authoritative.
 
 Validation writes exact archives and their provenance to `out/packages/`. Render with
 `xvfb-run -a python3 scripts/previews.py` and inspect every state. Render and publication consume
-that same snapshot. Release rechecks download the published archives. The native Rust packer is
+that same snapshot. Release rechecks enumerate published archives and authenticate them with the
+original SDK pins retained in their catalog entries and preview proofs. The native Rust packer is
 the production archive writer.
 
 Package and HUD formats independently begin at 1.0. Seed plugin versions begin at 1.0.0.

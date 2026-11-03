@@ -245,7 +245,7 @@ def generate(root: Path, output: Path, previews: Path, base_url: str, compatibil
             target.write_bytes(content)
             art.append({**scene, "file": published_name, "url": f"{base_url}/previews/{package.sha256}/{published_name}"})
         # Preserve the renderer's complete proof for hash-checked reuse of unchanged entries.
-        proof = {**manifest, "scenes": art}
+        proof = {**manifest, "scenes": art, "sdk": package.pin}
         proof_path = output / "previews" / package.sha256 / "manifest.json"
         proof_path.parent.mkdir(parents=True, exist_ok=True)
         proof_path.write_bytes(canonical(proof))
@@ -263,6 +263,7 @@ def generate(root: Path, output: Path, previews: Path, base_url: str, compatibil
         entries.append({"id": package.id, "version": m["version"], "package_format": m["package_format"], "hud_format": m["hud"]["format"],
                         "name": m["name"], "author": m["author"], "license": m["license"],
                         "app": bounds, "sha256": package.sha256, "bytes": len(package.content),
+                        "sdk": package.pin,
                         "url": f"{base_url}/p/{package.sha256}.plxhud", "previews": art,
                         "unfit": fit.get("unfit", [])})
     index = {"format": 1, "entries": entries, "revoked": tombstones}
