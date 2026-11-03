@@ -1,1 +1,1455 @@
-{"format": 1, "packages": {}}
+{
+  "format": 1,
+  "packages": {
+    "783ebc8d98659083104e98a06731ed5e33d3ba8b2259070a95a2d6bfd7673aec": {
+      "checks": {
+        "0.10.0": {
+          "all_failed": false,
+          "langs": [],
+          "nontext": false,
+          "report": {
+            "costs": [
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 12592,
+                  "draw_ops": 2,
+                  "glyph_runs": 2,
+                  "texture_bytes": 10816
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 35992,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "en",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 38124,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "es",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 40776,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "be",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 39632,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "fr",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 43376,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "it",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 37812,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "pt",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 41036,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "de",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 45248,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "hu",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 42232,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "ru",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 46964,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "pl",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 43480,
+                  "draw_ops": 3,
+                  "glyph_runs": 4,
+                  "texture_bytes": 0
+                },
+                "lang": "nl",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 21796,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "en",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 26580,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "es",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 28764,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "be",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 26944,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "fr",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 25540,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "it",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 25332,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "pt",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 29232,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "de",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 26892,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "hu",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 28868,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "ru",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 29440,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "pl",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 26996,
+                  "draw_ops": 2,
+                  "glyph_runs": 3,
+                  "texture_bytes": 0
+                },
+                "lang": "nl",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              }
+            ],
+            "file": "/home/runner/work/plxnative-huds/plxnative-huds/huds/com.plxnative.examples.minimal/hud.plxhud.json",
+            "findings": [],
+            "lint": 1
+          }
+        }
+      },
+      "unfit": []
+    },
+    "a8b017846b98b82f22385790599e9d4b77d2356fe22056649e992b820b047874": {
+      "checks": {
+        "0.10.0": {
+          "all_failed": false,
+          "langs": [],
+          "nontext": false,
+          "report": {
+            "costs": [
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 838253,
+                  "draw_ops": 11,
+                  "glyph_runs": 4,
+                  "texture_bytes": 81280
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 1395492,
+                  "draw_ops": 55,
+                  "glyph_runs": 25,
+                  "texture_bytes": 1306368
+                },
+                "class": "one-section",
+                "cost": {
+                  "blended_px": 1274323,
+                  "draw_ops": 53,
+                  "glyph_runs": 25,
+                  "texture_bytes": 942080
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "chapters,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 1395492,
+                  "draw_ops": 55,
+                  "glyph_runs": 25,
+                  "texture_bytes": 1306368
+                },
+                "class": "one-section",
+                "cost": {
+                  "blended_px": 1218221,
+                  "draw_ops": 18,
+                  "glyph_runs": 11,
+                  "texture_bytes": 272832
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "info,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 870381,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "en",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 873005,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "es",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 876269,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "be",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 874861,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "fr",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 879469,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "it",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 872621,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "pt",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 876589,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "de",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 881773,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "hu",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 878061,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "ru",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 883885,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "pl",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 879597,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "nl",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 852909,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "en",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 858797,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "es",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 861485,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "be",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 859245,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "fr",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 857517,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "it",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 857261,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "pt",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 862061,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "de",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 859181,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "hu",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 861613,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "ru",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 862317,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "pl",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 859309,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "nl",
+                "over": [],
+                "slot": "skip",
+                "state": "compact,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 1592851,
+                  "draw_ops": 62,
+                  "glyph_runs": 32,
+                  "texture_bytes": 970944
+                },
+                "class": "two-sections",
+                "cost": {
+                  "blended_px": 1592851,
+                  "draw_ops": 60,
+                  "glyph_runs": 32,
+                  "texture_bytes": 949312
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "chapters+info,movie"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 838253,
+                  "draw_ops": 13,
+                  "glyph_runs": 4,
+                  "texture_bytes": 102912
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 1395492,
+                  "draw_ops": 55,
+                  "glyph_runs": 25,
+                  "texture_bytes": 1306368
+                },
+                "class": "one-section",
+                "cost": {
+                  "blended_px": 1274323,
+                  "draw_ops": 55,
+                  "glyph_runs": 25,
+                  "texture_bytes": 963712
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "chapters"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 1395492,
+                  "draw_ops": 55,
+                  "glyph_runs": 25,
+                  "texture_bytes": 1306368
+                },
+                "class": "one-section",
+                "cost": {
+                  "blended_px": 1218221,
+                  "draw_ops": 20,
+                  "glyph_runs": 11,
+                  "texture_bytes": 294464
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "info"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 870381,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "en",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 873005,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "es",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 876269,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "be",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 874861,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "fr",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 879469,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "it",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 872621,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "pt",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 876589,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "de",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 881773,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "hu",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 878061,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "ru",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 883885,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "pl",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 879597,
+                  "draw_ops": 10,
+                  "glyph_runs": 6,
+                  "texture_bytes": 0
+                },
+                "lang": "nl",
+                "over": [],
+                "slot": "up_next",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 852909,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "en",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 858797,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "es",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 861485,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "be",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 859245,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "fr",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 857517,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "it",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 857261,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "pt",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 862061,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "de",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 859181,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "hu",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 861613,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "ru",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 862317,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "pl",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 985088,
+                  "draw_ops": 13,
+                  "glyph_runs": 9,
+                  "texture_bytes": 256120
+                },
+                "class": "compact",
+                "cost": {
+                  "blended_px": 859309,
+                  "draw_ops": 5,
+                  "glyph_runs": 5,
+                  "texture_bytes": 0
+                },
+                "lang": "nl",
+                "over": [],
+                "slot": "skip",
+                "state": "compact"
+              },
+              {
+                "ceiling": {
+                  "blended_px": 1592851,
+                  "draw_ops": 62,
+                  "glyph_runs": 32,
+                  "texture_bytes": 970944
+                },
+                "class": "two-sections",
+                "cost": {
+                  "blended_px": 1592851,
+                  "draw_ops": 62,
+                  "glyph_runs": 32,
+                  "texture_bytes": 970944
+                },
+                "over": [],
+                "slot": "discs",
+                "state": "chapters+info"
+              }
+            ],
+            "file": "/home/runner/work/plxnative-huds/plxnative-huds/huds/com.plxnative.examples.reference/hud.plxhud.json",
+            "findings": [],
+            "lint": 1
+          }
+        }
+      },
+      "unfit": []
+    }
+  }
+}
