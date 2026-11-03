@@ -81,7 +81,9 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
 - The real stable-release workflow uses the same dispatch sender after attaching its immutable SDK.
   The first actual stable app release carrying that SDK remains a future observation; the probe
   verifies transport and receiver wiring without inventing a stable release. The weekly schedule
-  and manual backstop use the same discovery/re-lint path.
+  and manual backstop use the same discovery/re-lint path. A post-merge manual backstop,
+  [run 41571212731](https://github.com/GLinnik21/plxnative-huds/actions/runs/41571212731),
+  passed and reported `No compatibility changes`, without opening a duplicate PR.
 - Deliberately incompatible release protocol fixtures test the production archive, manifest,
   calibration, subprocess lint, compatibility projection and notification paths. They verify a
   German-only failure, deduplicated notification, total/non-text failure ceiling, immutable old
@@ -150,7 +152,7 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   squash-landed as `3bc30f4edd3b392724968f9945dbef002cd646f2` through the landing tool, with
   all 19 GitHub checks passing. The current pin includes this fix; its 12,276 metric rows and
   font hashes are identical to the preceding SDK, and its source-bound profile again measures
-  directly against TV evidence. The complete corrected native run below closes that rerun requirement.
+  directly against TV evidence. The complete corrected native run above closes that rerun requirement.
 - The app's public schema URL returned HTTP 404 during the final authoring audit: the tracked
   `site/hud/` files were not copied by its Pages workflow. Follow-up branch
   `fix/hud-authoring-publication` (`a50307d32`) fixes that delivery gap and updates stale
@@ -167,7 +169,7 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
 - The owner-added dispatch credential passed app probe
   [41510758423](https://github.com/GLinnik21/plx-native/actions/runs/41510758423): the actual app
   workflow sent `app-release-probe` successfully. This verifies credential/API acceptance;
-  this first probe preceded registry landing. The post-landing receiver result is recorded below.
+  this first probe preceded registry landing. The post-landing receiver result is recorded above.
 - The owner configured public visibility and GitHub's combined Actions create/approve-PR setting.
   Pages is enabled with Actions builds and `PUBLISH_PAGES=true`; artifact staging remains available
   when publication is disabled. The automation creates review PRs and never approves or merges them.
