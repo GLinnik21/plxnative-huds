@@ -1,0 +1,166 @@
+name: HUD registry
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Deploy the verified catalog to Pages'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: registry-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install the pinned stock schema validator
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .cache/simulators
+          key: hud-validator-${{ runner.os }}-${{ hashFiles('toolchains.json') }}
+      - name: Prepare the preceding package versions
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != 0000000000000000000000000000000000000000 ]; then
+            mkdir -p out/previous
+            git archive "$BASE_SHA" | tar -x -C out/previous
+          fi
+      - name: Unit checks and schema/parser agreement in every language
+        run: |
+          .venv/bin/python -m unittest discover -s tests -v
+          if [ -d out/previous/huds ]; then
+            .venv/bin/python scripts/validate.py --previous out/previous
+          else
+            .venv/bin/python scripts/validate.py
+          fi
+          .venv/bin/python scripts/author_exercise.py > out/author-exercise.json
+      - id: matrix
+        name: One isolated render job per active package
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from catalog import packages, revoked
+          root=Path.cwd()
+          rejected={item['sha256'] for item in revoked(root)}
+          rows=[{'id':p.id} for p in packages(root) if p.sha256 not in rejected] or [{'id':'__none__'}]
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('matrix='+json.dumps({'include':rows})+'\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: registry-validation
+          path: out/
+          if-no-files-found: error
+          retention-days: 30
+  render:
+    needs: validate
+    runs-on: ubuntu-24.04
+    # Previous and current matrices may each take 90 minutes, plus setup and upload.
+    timeout-minutes: 210
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.validate.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: registry-validation
+          path: out
+      - name: Install the virtual display, encoder and Pillow
+        timeout-minutes: 15
+        run: |
+          sudo timeout 180 apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30
+          sudo timeout 600 apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri ffmpeg python3-pil
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .cache
+          key: hud-render-${{ runner.os }}-${{ matrix.id }}-${{ hashFiles('toolchains.json') }}
+      - name: Render and compare the complete native matrix
+        env:
+          PACKAGE: ${{ matrix.id }}
+          PYTHONUNBUFFERED: '1'
+          REUSE: https://glinnik21.github.io/plxnative-huds
+        run: |
+          mkdir -p out/previews
+          if [ "$PACKAGE" = __none__ ]; then
+            echo '{"active_packages":0}' > out/previews/empty.json
+          elif [ -f "out/previous/huds/$PACKAGE/hud.plxhud.json" ]; then
+            xvfb-run -a -s '-screen 0 1920x1080x24' python3 scripts/previews.py --root out/previous --out out/before --package "$PACKAGE" --reuse-url "$REUSE"
+            xvfb-run -a -s '-screen 0 1920x1080x24' python3 scripts/previews.py --package "$PACKAGE" --reuse-url "$REUSE" --previous-root out/previous --previous-previews out/before
+          else
+            xvfb-run -a -s '-screen 0 1920x1080x24' python3 scripts/previews.py --package "$PACKAGE" --reuse-url "$REUSE"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: registry-previews-${{ matrix.id }}
+          path: out/previews/
+          if-no-files-found: error
+          retention-days: 30
+  stage:
+    needs: [validate, render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: registry-previews-*
+          merge-multiple: true
+          path: out/previews
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .cache/simulators
+          key: hud-validator-${{ runner.os }}-${{ hashFiles('toolchains.json') }}
+      - name: Verify every preview proof and published byte
+        run: |
+          python3 scripts/publish.py --base-url https://glinnik21.github.io/plxnative-huds
+          python3 scripts/check_site.py out/site
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: registry-catalog
+          path: out/site/
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        if: (github.event_name == 'push' && vars.PUBLISH_PAGES == 'true') || inputs.publish
+        with:
+          path: out/site
+  publish:
+    needs: stage
+    if: (github.event_name == 'push' && vars.PUBLISH_PAGES == 'true') || inputs.publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5

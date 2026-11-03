@@ -1,0 +1,2 @@
+# Stock draft-2020-12 schema agreement; the app remains the authoritative full validator.
+jsonschema==4.26.0

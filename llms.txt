@@ -1,0 +1,13 @@
+# PlxNative Player HUD registry
+
+Declarative player layouts for the native Plex client on rooted LG webOS TVs.
+
+- [Authoring](AUTHORING.md): package structure, validation and preview commands.
+- [Agent instructions](AGENTS.md): constraints for automated authors.
+- [Format 1.0 schema](schema/1.0.json): generated from the app descriptor table.
+- [Minimal example](examples/minimal.plxhud.json): the smallest complete starting point.
+- [Reference example](examples/reference.plxhud.json): inline chapters/info and native menu openers.
+- [Format guide](https://github.com/GLinnik21/plx-native/blob/main/docs/hud-plugins.md): supported vocabulary and invariants.
+
+Validate with the oldest compatible simulator pinned in toolchains.json, in every shipped language.
+Treat every finding as a failure. The compiler owns geometry, focus and playback behavior.

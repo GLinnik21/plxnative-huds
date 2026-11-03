@@ -1,0 +1,135 @@
+{
+  "by_rung": {
+    "BODY": 4,
+    "CAPTION": 6,
+    "DISPLAY": 6,
+    "HEADLINE": 7,
+    "HERO": 9,
+    "HUD_TITLE": 8,
+    "LABEL": 4,
+    "MICRO": 7,
+    "TITLE": 6
+  },
+  "corpus_rows": 12276,
+  "evidence": {
+    "host": "1aba8dc7e43e15cc9bcd68b6824ed219712a42db65e62086918add14f86fc928",
+    "tv": "dc2e1f388421d0a4eab49ab97ffc4dbd08ef252f4cdfa02eb5f94bdbe394d3fe"
+  },
+  "font_hashes": {
+    "appfont-arabic-bold.ttf": "a2688019b048aedbc6a232d4332de5a02d938432e356ed694d62de0ae0d6fa1d",
+    "appfont-arabic.ttf": "e245bdc293b07d903603054f88746e8e51d9ff0bfd88905b0d9842198732d2b1",
+    "appfont-bold.ttf": "9a6d394cfe4d813618164f78174b3dd9654abee89442de4666b4fc936d5f92f7",
+    "appfont-cjk.ttf": "d8090a1458f9d76d1adc892321a505af6937aa10d34c0f06254d475a44701112",
+    "appfont-emoji.ttf": "8f1d6b7a40d9eae2acee4900e5f972d46da0e053410901121dce3541b805ef5b",
+    "appfont-hebrew-bold.ttf": "dfdb3056de1f4542b888c77a1a8a750548a802e271479f56e52152423b64dde8",
+    "appfont-hebrew.ttf": "04272f5600d0ec816d31d0df73b23aa8d3501ea359ebe820da31c11ffcf00853",
+    "appfont.ttf": "4ef24f0bac98d3a6a0d83805d906aeb6d5c49c73e0ba2228d8354ad6e5cb41a4"
+  },
+  "host_source_sha": "3bc30f4",
+  "languages": [
+    "be",
+    "de",
+    "en",
+    "es",
+    "fr",
+    "hu",
+    "it",
+    "nl",
+    "pl",
+    "pt",
+    "ru"
+  ],
+  "maxima": {
+    "BODY": {
+      "bold": false,
+      "delta": 4.0,
+      "host_width": 186.0,
+      "lang": "be",
+      "role": "command.open_tracks",
+      "tv_width": 190.0
+    },
+    "CAPTION": {
+      "bold": true,
+      "delta": 6.0,
+      "host_width": 138.0,
+      "lang": "en",
+      "role": "kicker.1",
+      "tv_width": 144.0
+    },
+    "DISPLAY": {
+      "bold": true,
+      "delta": 6.0,
+      "host_width": 155.0,
+      "lang": "be",
+      "role": "command.tracks_audio",
+      "tv_width": 161.0
+    },
+    "HEADLINE": {
+      "bold": false,
+      "delta": 7.0,
+      "host_width": 320.0,
+      "lang": "be",
+      "role": "skip.intro",
+      "tv_width": 327.0
+    },
+    "HERO": {
+      "bold": false,
+      "delta": 9.0,
+      "host_width": 215.0,
+      "lang": "be",
+      "role": "command.tracks_audio",
+      "tv_width": 224.0
+    },
+    "HUD_TITLE": {
+      "bold": false,
+      "delta": 8.0,
+      "host_width": 161.0,
+      "lang": "be",
+      "role": "command.tracks_audio",
+      "tv_width": 169.0
+    },
+    "LABEL": {
+      "bold": false,
+      "delta": 4.0,
+      "host_width": 77.0,
+      "lang": "be",
+      "role": "command.tracks_audio",
+      "tv_width": 81.0
+    },
+    "MICRO": {
+      "bold": true,
+      "delta": 7.0,
+      "host_width": 304.0,
+      "lang": "de",
+      "role": "command.more_speed",
+      "tv_width": 311.0
+    },
+    "TITLE": {
+      "bold": true,
+      "delta": 6.0,
+      "host_width": 129.0,
+      "lang": "be",
+      "role": "command.tracks_audio",
+      "tv_width": 135.0
+    }
+  },
+  "protocol": 1,
+  "renderer_hashes": {
+    "lib/libSDL2_ttf-2.0.so.0": "7ae63dbc8295e1b1fd1893855237ab37466d223f9dbb056155571603b4f8d1f5",
+    "lib/libfreetype.so.6": "af7a52ac4d4626947cb36ebf55279186d85d6a08f8ee97c421512d1a0b1ef2a7",
+    "lib/libharfbuzz.so.0": "883b045162bc0c91935f2c83970fede7fc8f9221e6b9227e88c07e9e84340610",
+    "pkg/libass-plx-host.so.0": "789639d66793f13525179ed04e91d0e85ee6e2488362daae39bff475721f0852"
+  },
+  "tv_source_sha": "9266c34e7",
+  "type_sizes": {
+    "BODY": 28,
+    "CAPTION": 24,
+    "DISPLAY": 48,
+    "HEADLINE": 32,
+    "HERO": 72,
+    "HUD_TITLE": 54,
+    "LABEL": 26,
+    "MICRO": 22,
+    "TITLE": 40
+  }
+}
