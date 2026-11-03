@@ -7,10 +7,10 @@ Reference and Minimal seed the registry. Validation uses the app's exact compile
 languages and the oldest compatible hash-pinned Ubuntu 24.04 x86_64 simulator. CI renders native state previews,
 checks original-byte hashes and prepares a Pages catalog with revocation and compatibility data.
 
-The repository is private during PR12 staging. `IMPLEMENTATION.md` records the remaining acceptance
-evidence. Pushes always retain the verified catalog as a CI artifact. Set the repository variable
-`PUBLISH_PAGES=true` to deploy main automatically, or dispatch the workflow with `publish=true`
-for an explicit deployment. Pages hosting must first be available for the repository/account plan.
+The registry is public. `IMPLEMENTATION.md` records acceptance evidence. Main deploys the verified
+catalog to [GitHub Pages](https://glinnik21.github.io/plxnative-huds/) with the repository variable
+`PUBLISH_PAGES=true`. Pushes also retain the catalog as a CI artifact. Disabling that variable
+keeps artifact staging available; a manual workflow dispatch with `publish=true` deploys explicitly.
 
 The app workflow can send an `app-release-probe` after the dispatch secret is configured. This
 runs the same registry discovery/re-lint backstop without accepting a synthetic app-release pin.
