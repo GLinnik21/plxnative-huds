@@ -11,7 +11,7 @@ import tempfile
 from urllib.request import build_opener
 from urllib.error import URLError
 import sys
-from catalog import Invalid, canonical, oldest, packages, public_origin, read_json, revoked
+from catalog import Invalid, canonical, oldest, packages, public_origin, read_json, require_sources, revoked
 from simulator import SecureRedirect, Simulator, acquire, toolchains
 
 
@@ -103,12 +103,13 @@ def published(sim, package, directory, base_url):
         return True
 
 
-def render(root, cache, output, previous_root=None, previous_previews=None, local=None, only=None, reuse_url=None):
+def render(root, cache, output, snapshot=Path("out/packages"), previous_snapshot=None, previous_previews=None, local=None, only=None, reuse_url=None):
     pins = toolchains(root)
     rejected = {item["sha256"] for item in revoked(root)}
-    before = {p.id: p for p in packages(previous_root)} if previous_root else {}
+    before = {p.id: p for p in packages(previous_snapshot)} if previous_snapshot else {}
     prepared = set()
-    candidates = packages(root)
+    candidates = packages(snapshot)
+    require_sources(root, candidates)
     if only is not None:
         candidates = [package for package in candidates if package.id == only]
         if not candidates:
@@ -117,7 +118,10 @@ def render(root, cache, output, previous_root=None, previous_previews=None, loca
         if package.sha256 in rejected:
             continue
         pin = oldest(package, pins)
+        if package.pin != pin:
+            raise Invalid("package was built with a different SDK than the selected pin")
         sim = Simulator(local or acquire(pin, cache), pin, root / pin["calibration"])
+        sim.inspect(package)
         directory = output / package.sha256
         reused = reuse_url is not None and published(sim,package,directory,reuse_url)
         if reused:
@@ -147,13 +151,14 @@ def main():
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--cache", type=Path, default=Path(".cache/simulators"))
     parser.add_argument("--out", type=Path, default=Path("out/previews"))
-    parser.add_argument("--previous-root", type=Path)
+    parser.add_argument("--packages", type=Path, default=Path("out/packages"))
+    parser.add_argument("--previous-packages", type=Path)
     parser.add_argument("--previous-previews", type=Path)
     parser.add_argument("--local-simulator", type=Path)
     parser.add_argument("--package")
     parser.add_argument("--reuse-url")
     args = parser.parse_args()
-    render(args.root, args.cache, args.out, args.previous_root, args.previous_previews, args.local_simulator, args.package, args.reuse_url)
+    render(args.root, args.cache, args.out, args.packages, args.previous_packages, args.previous_previews, args.local_simulator, args.package, args.reuse_url)
 
 
 if __name__ == "__main__":

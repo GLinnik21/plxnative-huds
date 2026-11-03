@@ -1,4 +1,27 @@
-# PR12 acceptance record
+# Bundle 1.0 acceptance
+
+The initial bundle contract separates manifest and HUD documents, both at version 1.0, and keeps
+seed plugin releases at 1.0.0. The registry implementation uses native-built `.plxhud` snapshots
+through validation, rendering and publication. Release rechecks consume published archive bytes.
+
+Native acceptance is pending the new SDK publication and its source-bound calibration and schema
+mirrors. The earlier development pin and measured TV evidence are retained until their replacement
+is derived from that real SDK. Python protocol fixtures exercise pipeline behavior with explicitly
+synthetic executables and data.
+
+- [ ] Import both schema mirrors from the new SDK and verify pin/bundle/binary support and limits.
+- [ ] Pass the indexed native document/archive corpus and all-language package lint.
+- [ ] Record the two native authoring iterations with member and JSON-pointer findings.
+- [ ] Render and inspect the complete Reference and Minimal matrices and normal before/after differences.
+- [ ] Publish identical validated archive bytes and verify every download and preview hash.
+- [ ] Complete the release-dispatch/recheck path with the new SDK and exact published archives.
+
+## Earlier developer-tool acceptance record
+
+The following evidence describes the preceding inline-JSON developer tools and their actual
+runs. Bundle acceptance is tracked above.
+
+## PR12 acceptance record
 
 The owner made this registry public and enabled Actions to create compatibility pull requests.
 Repository token defaults remain read-only; write permissions are limited to the relevant jobs.

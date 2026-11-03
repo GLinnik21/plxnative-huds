@@ -11,7 +11,7 @@ def check(root):
     revoked = {item["sha256"] for item in index["revoked"]}
     for entry in index["entries"]:
         assert entry["sha256"] not in revoked, "revoked package remains offered"
-        path = root / "p" / (entry["sha256"] + ".plxhud.json")
+        path = root / "p" / (entry["sha256"] + ".plxhud")
         data = path.read_bytes()
         assert len(data) == entry["bytes"] and hashlib.sha256(data).hexdigest() == entry["sha256"]
         assert urlsplit(entry["url"]).path.endswith("/p/" + path.name)

@@ -60,7 +60,7 @@ jobs:
           from catalog import packages, revoked
           root=Path.cwd()
           rejected={item['sha256'] for item in revoked(root)}
-          rows=[{'id':p.id} for p in packages(root) if p.sha256 not in rejected] or [{'id':'__none__'}]
+          rows=[{'id':p.id} for p in packages(Path('out/packages')) if p.sha256 not in rejected] or [{'id':'__none__'}]
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('matrix='+json.dumps({'include':rows})+'\n')
           PY
@@ -106,9 +106,9 @@ jobs:
           mkdir -p out/previews
           if [ "$PACKAGE" = __none__ ]; then
             echo '{"active_packages":0}' > out/previews/empty.json
-          elif [ -f "out/previous/huds/$PACKAGE/hud.plxhud.json" ]; then
-            xvfb-run -a -s '-screen 0 1920x1080x24' python3 scripts/previews.py --root out/previous --out out/before --package "$PACKAGE" --reuse-url "$REUSE"
-            xvfb-run -a -s '-screen 0 1920x1080x24' python3 scripts/previews.py --package "$PACKAGE" --reuse-url "$REUSE" --previous-root out/previous --previous-previews out/before
+          elif [ -f "out/previous/huds/$PACKAGE/manifest.json" ]; then
+            xvfb-run -a -s '-screen 0 1920x1080x24' python3 scripts/previews.py --root out/previous --packages out/previous-packages --out out/before --package "$PACKAGE" --reuse-url "$REUSE"
+            xvfb-run -a -s '-screen 0 1920x1080x24' python3 scripts/previews.py --package "$PACKAGE" --reuse-url "$REUSE" --previous-packages out/previous-packages --previous-previews out/before
           else
             xvfb-run -a -s '-screen 0 1920x1080x24' python3 scripts/previews.py --package "$PACKAGE" --reuse-url "$REUSE"
           fi
@@ -127,6 +127,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: registry-validation
+          path: out
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: registry-previews-*
