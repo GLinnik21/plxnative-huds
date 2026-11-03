@@ -19,11 +19,11 @@ Completion requires evidence for every item below, not merely a green Python sui
   Changed packages include a comparison against the previous version's previews.
 - [x] Publisher emits a deterministic index, original package bytes at content-addressed URLs,
   preview URLs and hashes, and revocation reasons. Every published hash is checked.
-- [ ] GitHub Pages publication is exercised end-to-end; disabling publication still produces
+- [x] GitHub Pages publication is exercised end-to-end; disabling publication still produces
   the same verifiable catalog artifact for private staging.
 - [x] Authoring kit includes AGENTS.md, llms.txt, AUTHORING.md, examples, schema and lint guidance.
   An authoring exercise succeeds using only the kit, schema, example and at most two lint runs.
-- [ ] An app release sends repository_dispatch; weekly re-lint is the fallback. Compatibility
+- [x] The app release workflow sends repository_dispatch; weekly re-lint is the fallback. Compatibility
   data records per-language unfit results, caps app.max after total failure, and files a deduplicated
   author issue. These branches are exercised using a deliberately incompatible test release.
 - [x] Simulator/TV text-width corpus is measured at every supported rung in all languages.
@@ -50,7 +50,19 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   prose review found no remaining issues. [PR #1](https://github.com/GLinnik21/plxnative-huds/pull/1)
   squash-landed as `2ab53fe2ff4678e455f971f7a611b8c6a6195f91` after its four CI jobs passed;
   publication was intentionally skipped on the submission PR. The first main publication is
-  [run 41567297415](https://github.com/GLinnik21/plxnative-huds/actions/runs/41567297415).
+  [run 41567297415](https://github.com/GLinnik21/plxnative-huds/actions/runs/41567297415),
+  which passed all five jobs including deployment.
+- Production readback fetched all 87 files (91,949,606 bytes) from
+  [GitHub Pages](https://glinnik21.github.io/plxnative-huds/) and matched the staged artifact
+  byte for byte, including both original package downloads, preview manifests and all PNG hashes.
+  The deployed index SHA-256 is
+  `b604f5495c6c713139251de6536dec43bf7bd998f117cad2f7a37522c1f053bb`;
+  an `If-None-Match` read of its ETag returned HTTP 304.
+- Production Reference's 70 captures are byte-identical to the inspected corrected baseline.
+  Minimal has 31 identical captures; Up Next differs in 133 button-area pixels by at most one
+  channel level. Both full-size images were inspected: placement, labels and footage agree.
+  All 102 production PNGs pass native dimensions and SHA-256 checks. Production validation again
+  passed 17 schema/parser fixtures per HUD, all eleven languages, and the two-iteration exercise.
 
 ## Release-notification integration
 
@@ -59,8 +71,13 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   It triggered registry [receiver 41567344597](https://github.com/GLinnik21/plxnative-huds/actions/runs/41567344597),
   which completed discovery and native all-language re-linting and opened
   [compatibility PR #2](https://github.com/GLinnik21/plxnative-huds/pull/2).
-  The proposed projection contains exactly the two original package hashes, no findings, no unfit
+  The projection contains exactly the two original package hashes, no findings, no unfit
   languages and no compatibility ceilings. Its package bytes and immutable simulator pin are unchanged.
+  [Gate 41567368097](https://github.com/GLinnik21/plxnative-huds/actions/runs/41567368097)
+  passed validation, both complete before/current preview checks and staging; publication was
+  intentionally skipped on the PR. The logs confirm verified public-proof reuse for both HUDs.
+  Reviewed head `02a0ec23488c0a5790ff1f7423c14e4295eb38bc` squash-landed as
+  `12c56a93c5a7ea7cfd7419c407012151b35b5fb6`.
 - The real stable-release workflow uses the same dispatch sender after attaching its immutable SDK.
   The first actual stable app release carrying that SDK remains a future observation; the probe
   verifies transport and receiver wiring without inventing a stable release. The weekly schedule
