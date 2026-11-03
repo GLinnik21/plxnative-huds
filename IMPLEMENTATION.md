@@ -35,7 +35,10 @@ the existing `acquire` and `verify_bundle` helpers. [App SDK CI](https://github.
 | Existing TV text report | `dc2e1f388421d0a4eab49ab97ffc4dbd08ef252f4cdfa02eb5f94bdbe394d3fe` |
 
 `release_profile` compared all 12,276 rows directly with TV source `9266c34e7`, including every
-language, type rung and weight. Font identities, corpus coverage and text/type sizes matched.
+language, type rung and weight. Font identities, corpus coverage, all non-clock text and all type
+sizes matched. The 22 `clock.max.false`/`clock.max.true` samples across eleven languages use
+renderer-specific widest-clock exemplars. Their maximum widths are compared under the existing
+clock-envelope rule in `calibrate.py`.
 The new source-bound profile reproduces the measured 4–9 px per-rung margins. Its host report is
 retained byte for byte, and the profile binds both report hashes and the SDK's renderer identities.
 
