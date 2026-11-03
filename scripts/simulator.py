@@ -190,6 +190,8 @@ class Simulator:
         self.calibration = calibration
         self.env = {key: value for key, value in os.environ.items() if not key.startswith("PLXNATIVE_")}
         self.env["PLXNATIVE_APP_DIR"] = str(self.root / "pkg")
+        # Bundled preview helpers import other SDK modules. Keep the verified SDK immutable.
+        self.env["PYTHONDONTWRITEBYTECODE"] = "1"
         info = self.run("--hud-info")
         if (info.get("protocol") != 1 or not isinstance(info.get("source_sha"), str)
             or not re.fullmatch("[0-9a-f]{9,40}", info["source_sha"])

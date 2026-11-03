@@ -22,6 +22,9 @@ class Pinning(unittest.TestCase):
                 "app_version": value["app_version"], "source_sha": value["source_sha"][:9],
                 "languages": ["en"], "rungs": {"BODY": 28}}
         manifest = {"reported_version": value["app_version"]}
+        with patch("simulator.verify_bundle", return_value=manifest), patch.object(Simulator, "run", return_value=info):
+            sdk = Simulator(Path("fixture-sdk"), value)
+            self.assertEqual(sdk.env["PYTHONDONTWRITEBYTECODE"], "1")
         for field, replacement in (("supported_formats", [{"package": "1.1", "hud": "1.0"}]),
                                    ("schemas", {"manifest": {"1.0": "https://example.invalid/schema"}, "hud": SCHEMAS["hud"]}),
                                    ("limits", {**LIMITS, "package": {"1.0": {"artifact_bytes": 17}}})):
