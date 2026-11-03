@@ -1,6 +1,7 @@
 # PR12 acceptance record
 
-This registry remains private before release. Test publication is authorized by the owner.
+The owner made this registry public and enabled Actions to create compatibility pull requests.
+Repository token defaults remain read-only; write permissions are limited to the relevant jobs.
 The app implementation landed in [plx-native PR #1206](https://github.com/GLinnik21/plx-native/pull/1206)
 as squash `f1436ba4746c477537144276ff928840f0be7566`.
 
@@ -12,7 +13,7 @@ Completion requires evidence for every item below, not merely a green Python sui
   app version for each package. A new app release cannot silently replace an older pin.
 - [x] Submission CI uses the app's lint in all shipped languages, compares the generated schema
   against the mirror, and checks schema/parser agreement on the fixture corpus.
-- [ ] Linux/Xvfb previews cover transport states, episode navigation, Up Next, both Skip kinds,
+- [x] Linux/Xvfb previews cover transport states, episode navigation, Up Next, both Skip kinds,
   every allowed section combination, both player menus at every authored opener, failure,
   long server text in every shipped language, largest/highest captions, bright/dark backgrounds.
   Changed packages include a comparison against the previous version's previews.
@@ -27,11 +28,48 @@ Completion requires evidence for every item below, not merely a green Python sui
   author issue. These branches are exercised using a deliberately incompatible test release.
 - [x] Simulator/TV text-width corpus is measured at every supported rung in all languages.
   The measured per-rung margin is enforced only by registry CI, without weakening TV fit checks.
-- [ ] A seeded PR containing Reference and Minimal passes actual CI and produces inspected previews.
-- [ ] App gates, before/after build-bench, review, and squash landing complete; registry also
+- [x] A seeded PR containing Reference and Minimal passes actual CI and produces inspected previews.
+- [x] App gates, before/after build-bench, review, and squash landing complete; registry also
   uses a reviewed, green PR. No real Plex account is used for verification.
 
 Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR16, respectively.
+
+## Corrected native acceptance and registry landing
+
+- [Run 41517403918](https://github.com/GLinnik21/plxnative-huds/actions/runs/41517403918)
+  passed validation, 70 Reference states, 32 Minimal states and catalog staging on reviewed registry
+  head `a4483fa3f92c86ea27ffdc82303b16298500ce7b`. Every capture binds the corrected app source
+  `3bc30f4edd3b392724968f9945dbef002cd646f2`, is native 1920×1080, and passed its SHA-256 check.
+  Compared with the fully inspected chapter-corrected baseline, 101 PNGs are byte-identical.
+  The only changed capture is Reference's Belarusian long title; visual inspection confirms the
+  replacement glyph is gone. The title's existing 128-byte capacity remains unchanged.
+- Two independent catalog generations matched all 87 staged files byte for byte. Original HUD
+  JSON bytes are preserved. The staged index SHA-256 is
+  `82d63c40d619a3abdf7bc3284293a3ae22c9d631a33a613e25eba740020cc4b9`.
+- All 28 registry tests passed on the exact clean reviewed head. Combined implementation and
+  prose review found no remaining issues. [PR #1](https://github.com/GLinnik21/plxnative-huds/pull/1)
+  squash-landed as `2ab53fe2ff4678e455f971f7a611b8c6a6195f91` after its four CI jobs passed;
+  publication was intentionally skipped on the submission PR. The first main publication is
+  [run 41567297415](https://github.com/GLinnik21/plxnative-huds/actions/runs/41567297415).
+
+## Release-notification integration
+
+- Post-landing app [probe 41567314247](https://github.com/GLinnik21/plx-native/actions/runs/41567314247)
+  succeeded through the configured dispatch secret without building or publishing an app release.
+  It triggered registry [receiver 41567344597](https://github.com/GLinnik21/plxnative-huds/actions/runs/41567344597),
+  which completed discovery and native all-language re-linting and opened
+  [compatibility PR #2](https://github.com/GLinnik21/plxnative-huds/pull/2).
+  The proposed projection contains exactly the two original package hashes, no findings, no unfit
+  languages and no compatibility ceilings. Its package bytes and immutable simulator pin are unchanged.
+- The real stable-release workflow uses the same dispatch sender after attaching its immutable SDK.
+  The first actual stable app release carrying that SDK remains a future observation; the probe
+  verifies transport and receiver wiring without inventing a stable release. The weekly schedule
+  and manual backstop use the same discovery/re-lint path.
+- Deliberately incompatible release protocol fixtures test the production archive, manifest,
+  calibration, subprocess lint, compatibility projection and notification paths. They verify a
+  German-only failure, deduplicated notification, total/non-text failure ceiling, immutable old
+  pins, later recovery and unchanged package bytes. These are isolated executable test releases;
+  they make no native-rendering or live GitHub-issue claim.
 
 ## Implementation checkpoints
 
@@ -68,8 +106,8 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   inspected and hash/dimension checked. Two independent publications matched all 87 catalog
   files byte for byte (index SHA-256 `c5b73c788f70622b009333f085ef953726bb6a4ae882875cb4b2d4aeaa4ebe4e`).
   Inspection exposed that long-chapter scenes wrote PMS `title` instead of `tag`; a failing-then-
-  passing regression fixes it in app follow-up `a50307d32`. The corrected bundle must be pinned
-  and the complete matrix recaptured before the preview and seeded-PR acceptance boxes close.
+  passing regression fixes it in app follow-up `a50307d32`. The corrected bundle required a new pin
+  and complete recapture; the corrected native acceptance record above closes those requirements.
   That corrected bundle was published and independently hash-verified; its bundled `hud_preview.py`
   matches the reviewed chapter correction byte for byte. Corrected run
   [41489989922](https://github.com/GLinnik21/plxnative-huds/actions/runs/41489989922) passed
@@ -95,7 +133,7 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   squash-landed as `3bc30f4edd3b392724968f9945dbef002cd646f2` through the landing tool, with
   all 19 GitHub checks passing. The current pin includes this fix; its 12,276 metric rows and
   font hashes are identical to the preceding SDK, and its source-bound profile again measures
-  directly against TV evidence. The complete native matrix must be rerun before acceptance.
+  directly against TV evidence. The complete corrected native run below closes that rerun requirement.
 - The app's public schema URL returned HTTP 404 during the final authoring audit: the tracked
   `site/hud/` files were not copied by its Pages workflow. Follow-up branch
   `fix/hud-authoring-publication` (`a50307d32`) fixes that delivery gap and updates stale
@@ -112,9 +150,10 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
 - The owner-added dispatch credential passed app probe
   [41510758423](https://github.com/GLinnik21/plx-native/actions/runs/41510758423): the actual app
   workflow sent `app-release-probe` successfully. This verifies credential/API acceptance;
-  receiving-workflow behavior still requires this registry PR on the default branch.
-- Repository visibility and GitHub's combined Actions create/approve-PR setting remain unchanged
-  pending owner approval. Pages is explicitly opt-in; private pushes retain the catalog artifact.
+  this first probe preceded registry landing. The post-landing receiver result is recorded below.
+- The owner configured public visibility and GitHub's combined Actions create/approve-PR setting.
+  Pages is enabled with Actions builds and `PUBLISH_PAGES=true`; artifact staging remains available
+  when publication is disabled. The automation creates review PRs and never approves or merges them.
 - Deliberately incompatible protocol-fixture app releases exercise archive/manifest verification,
   real child-process lint reports, release acceptance/idempotence, per-language `unfit`, author
   notification dispatch, total-failure `app.max`, recovery and unchanged original package bytes.
