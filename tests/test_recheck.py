@@ -5,6 +5,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from recheck import verdict, update, notify, issue, recheck
 from catalog import Invalid, Package
+from test_bundles import metadata, pin
 
 
 class ReleaseCheck(unittest.TestCase):
@@ -41,12 +42,11 @@ class ReleaseCheck(unittest.TestCase):
                          [{"from":"0.11.0","langs":["de","en"]},{"from":"0.12.0","langs":[]}])
 
     def test_future_format_is_not_checked_against_older_unsupported_compilers(self):
-        package=Package(Path("hud.json"),{"id":"com.example.future","format":"1.1"},b"", "hash")
-        pins=[{"app_version":"0.10.0","formats":["1.0"],"calibration":"old.json"},
-              {"app_version":"0.11.0","formats":["1.0","1.1"],"calibration":"new.json"}]
+        package=Package(Path("hud.json"),{**metadata("com.example.future"),"hud":{"format":"1.1","entry":"hud.json"}},b"", "hash")
+        pins=[pin("0.10.0"), {**pin("0.11.0"),"supported_formats":[{"package":"1.0","hud":"1.0"},{"package":"1.0","hud":"1.1"}]}]
         with patch("recheck.toolchains",return_value=pins), patch("recheck.revoked",return_value=[]), \
              patch("recheck.read_json",return_value={package.id:["author"]}), \
-             patch("recheck.packages",return_value=[package]), patch("recheck.Simulator") as simulator:
+             patch("recheck.published_packages",return_value=[package]), patch("recheck.Simulator") as simulator:
             simulator.return_value.languages=["en"]
             simulator.return_value.lint.return_value={"findings":[]}
             result=recheck(Path("registry"),Path("cache"),{},local=Path("bundle"))

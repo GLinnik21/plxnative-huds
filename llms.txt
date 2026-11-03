@@ -2,12 +2,13 @@
 
 Declarative player layouts for the native Plex client on rooted LG webOS TVs.
 
-- [Authoring](AUTHORING.md): package structure, validation and preview commands.
-- [Agent instructions](AGENTS.md): constraints for automated authors.
-- [Format 1.0 schema](schema/1.0.json): generated from the app descriptor table.
-- [Minimal example](examples/minimal.plxhud.json): the smallest complete starting point.
-- [Reference example](examples/reference.plxhud.json): inline chapters/info and native menu openers.
-- [Format guide](https://github.com/GLinnik21/plx-native/blob/main/docs/hud-plugins.md): supported vocabulary and invariants.
+- Authoring describes editable source directories, native packaging and preview commands. [Authoring](AUTHORING.md)
+- Agent instructions describe the native compiler and artifact-integrity workflow. [Agent instructions](AGENTS.md)
+- The generated manifest schema owns package metadata and resources. [Manifest 1.0](schema/manifest/1.0.json)
+- The generated HUD schema owns rendering. [HUD 1.0](schema/hud/1.0.json)
+- Minimal supplies a complete starting source directory. [Minimal](examples/minimal/)
+- Reference supplies inline sections and native menu openers. [Reference](examples/reference/)
+- The app's format guide defines supported vocabulary and invariants. [Format guide](https://github.com/GLinnik21/plx-native/blob/main/docs/hud-plugins.md)
 
-Validate with the oldest compatible simulator pinned in toolchains.json, in every shipped language.
-Treat every finding as a failure. The compiler owns geometry, focus and playback behavior.
+Use the oldest compatible SDK pinned in toolchains.json and lint every shipped language.
+Treat every finding as requiring correction. Keep JSON condition order and archive hashes intact.

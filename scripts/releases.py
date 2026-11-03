@@ -7,7 +7,7 @@ import subprocess
 from urllib.request import urlopen
 from calibrate import release_profile
 from catalog import Invalid, canonical, read_json, release
-from simulator import acquire, toolchains, validate_pin, verify_bundle
+from simulator import CONTRACT_KEYS, Simulator, acquire, toolchains, validate_pin, verify_bundle
 
 APP = "GLinnik21/plx-native"
 ARCHIVE = "plxnative-hud-simulator-linux-x86_64.tar.gz"
@@ -31,13 +31,14 @@ def accept(root, cache, pin):
     matching = next((item for item in previous if item["app_version"] == pin["app_version"]), None)
     if matching and not matching.get("development"):
         # A repeated dispatch is idempotent, but changing any immutable identity is an error.
-        for key in ("source_sha", "sha256", "manifest_sha256", "bytes", "formats", "url"):
+        for key in ("source_sha", "sha256", "manifest_sha256", "bytes", "url", *CONTRACT_KEYS):
             if matching[key] != pin[key]:
                 raise Invalid("app release attempted to replace an immutable simulator")
         return False
     pin["calibration"] = "calibration/" + pin["manifest_sha256"] + ".json"
     validate_pin(pin)
     directory = acquire(pin, cache)
+    Simulator(directory, pin)
     host = read_json(directory / "text-metrics.json")
     television = read_json(root / "calibration/tv-metrics.json")
     profiles = [read_json(root / item["calibration"]) for item in sorted(previous, key=lambda item: release(item["app_version"]))]

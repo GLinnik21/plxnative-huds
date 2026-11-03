@@ -8,6 +8,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import catalog
+from check_site import check
+from test_bundles import metadata, pin
 
 
 class CatalogTests(unittest.TestCase):
@@ -18,16 +20,21 @@ class CatalogTests(unittest.TestCase):
         self.ident = "org.example.hud"
         self.directory = self.root / "huds" / self.ident
         self.directory.mkdir(parents=True)
-        self.metadata = {"id": self.ident, "version": "1.0.0", "format": "1.0", "name": "Example", "author": "Author", "license": "CC0-1.0"}
+        self.metadata = metadata(self.ident)
         self.write()
         (self.directory / "README.md").write_text("Example\n")
         (self.root / "revoked.json").write_text("[]\n")
 
     def write(self):
-        (self.directory / "hud.plxhud.json").write_bytes(catalog.canonical(self.metadata))
+        (self.directory / "manifest.json").write_bytes(catalog.canonical(self.metadata))
 
     def package(self):
-        return catalog.packages(self.root)[0]
+        source = catalog.sources(self.root)[0]
+        content = b"Opaque archive protocol fixture\n" + (source.path / "manifest.json").read_bytes()
+        digest = hashlib.sha256(content).hexdigest()
+        path = self.root / (digest + ".plxhud")
+        path.write_bytes(content)
+        return catalog.Package(path, source.metadata, content, digest, pin())
 
     def preview(self, package):
         out = self.root / "renders" / package.sha256
@@ -43,7 +50,7 @@ class CatalogTests(unittest.TestCase):
         self.write()
         with self.assertRaisesRegex(catalog.Invalid, "differs"):
             self.package()
-        path = self.directory / "hud.plxhud.json"
+        path = self.directory / "manifest.json"
         path.unlink()
         target = self.root / "elsewhere.json"
         target.write_bytes(catalog.canonical(self.metadata))
@@ -52,7 +59,7 @@ class CatalogTests(unittest.TestCase):
             self.package()
 
     def test_duplicate_keys_and_nonrelease_versions_are_refused(self):
-        (self.directory / "hud.plxhud.json").write_text('{"id":"one","id":"two"}')
+        (self.directory / "manifest.json").write_text('{"id":"one","id":"two"}')
         with self.assertRaisesRegex(catalog.Invalid, "duplicate"):
             self.package()
         for version in ("1.0", "01.0.0", "1.0.0-rc.1", None, True):
@@ -62,7 +69,7 @@ class CatalogTests(unittest.TestCase):
     def test_oldest_compatible_pin_is_used_instead_of_latest(self):
         self.metadata["app"] = {"min": "0.10.0", "max": "0.12.0"}
         self.write()
-        pins = [{"app_version": version, "formats": formats, "source_sha": "a"*40} for version, formats in
+        pins = [{"app_version": version, "supported_formats": [{"package": "1.0", "hud": value} for value in formats], "source_sha": "a"*40} for version, formats in
                 [("0.12.0", ["1.0"]), ("0.9.0", ["1.0"]), ("0.10.0", ["1.1"]), ("0.11.0", ["1.0"])]]
         self.assertEqual(catalog.oldest(self.package(), pins)["app_version"], "0.11.0")
         with self.assertRaisesRegex(catalog.Invalid, "no pinned"):
@@ -82,13 +89,22 @@ class CatalogTests(unittest.TestCase):
         package = self.package()
         previews = self.preview(package)
         a, b = self.root / "a", self.root / "b"
-        first = catalog.generate(self.root, a, previews, "https://example.invalid/huds", {})
-        second = catalog.generate(self.root, b, previews, "https://example.invalid/huds", {})
+        first = catalog.generate(self.root, a, previews, "https://example.invalid/huds", {}, [package])
+        second = catalog.generate(self.root, b, previews, "https://example.invalid/huds", {}, [package])
         self.assertEqual(first, second)
         self.assertEqual((a / "index.json").read_bytes(), (b / "index.json").read_bytes())
-        self.assertEqual((a / "p" / (package.sha256+".plxhud.json")).read_bytes(), package.content)
+        self.assertEqual((a / "p" / (package.sha256+".plxhud")).read_bytes(), package.content)
         self.assertEqual(first["entries"][0]["sha256"], hashlib.sha256(package.content).hexdigest())
         self.assertEqual(first["entries"][0]["bytes"], len(package.content))
+        self.assertEqual(first["entries"][0]["sdk"], package.pin)
+        proof = catalog.read_json(a / "previews" / package.sha256 / "manifest.json")
+        self.assertEqual(proof["sdk"], package.pin)
+        (a / "CREDITS.md").write_text("Protocol fixture\n")
+        self.assertEqual(check(a), 1)
+        proof["sdk"] = {**package.pin, "sha256": "0" * 64}
+        (a / "previews" / package.sha256 / "manifest.json").write_bytes(catalog.canonical(proof))
+        with self.assertRaises(AssertionError):
+            check(a)
 
     def test_bad_preview_hash_or_path_never_publishes_an_index(self):
         package = self.package()
@@ -100,14 +116,14 @@ class CatalogTests(unittest.TestCase):
             manifest_path.write_bytes(catalog.canonical(manifest))
             output = self.root / "published"
             with self.assertRaises(catalog.Invalid):
-                catalog.generate(self.root, output, previews, "https://example.invalid/huds", {})
+                catalog.generate(self.root, output, previews, "https://example.invalid/huds", {}, [package])
             self.assertFalse((output / "index.json").exists())
 
     def test_revoked_hash_is_removed_but_reason_remains_available(self):
         package = self.package()
         revocation = {"sha256": package.sha256, "reason": "Author withdrew this version"}
         (self.root / "revoked.json").write_bytes(catalog.canonical([revocation]))
-        index = catalog.generate(self.root, self.root / "out", self.root / "no-previews", "https://example.invalid", {})
+        index = catalog.generate(self.root, self.root / "out", self.root / "no-previews", "https://example.invalid", {}, [package])
         self.assertEqual(index["entries"], [])
         self.assertEqual(index["revoked"], [revocation])
 
@@ -116,10 +132,10 @@ class CatalogTests(unittest.TestCase):
         self.write()
         package = self.package()
         compatibility = {"packages": {package.sha256: {"app_max": "0.12.0", "unfit": [{"from": "0.12.0", "langs": ["de"]}]}}}
-        index = catalog.generate(self.root, self.root / "out", self.preview(package), "https://example.invalid", compatibility)
+        index = catalog.generate(self.root, self.root / "out", self.preview(package), "https://example.invalid", compatibility, [package])
         self.assertEqual(index["entries"][0]["app"]["max"], "0.11.0")
         self.assertEqual(index["entries"][0]["unfit"], [{"from": "0.12.0", "langs": ["de"]}])
-        self.assertEqual((self.directory / "hud.plxhud.json").read_bytes(), package.content)
+        self.assertEqual(package.path.read_bytes(), package.content)
 
 
 if __name__ == "__main__":

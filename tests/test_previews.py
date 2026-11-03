@@ -16,11 +16,11 @@ class PreviewProof(unittest.TestCase):
     def setUp(self):
         self.temporary=tempfile.TemporaryDirectory(); self.addCleanup(self.temporary.cleanup)
         self.root=Path(self.temporary.name)
-        self.package=SimpleNamespace(id="com.example.hud",sha256="a"*64)
+        self.package=SimpleNamespace(id="com.example.hud",sha256="a"*64,pin={"sha256":"b"*64})
         self.sim=SimpleNamespace(info={"source_sha":"pinned","languages":["en"]})
         self.image=b'\x89PNG\r\n\x1a\n'+(13).to_bytes(4,'big')+b'IHDR'+(1920).to_bytes(4,'big')+(1080).to_bytes(4,'big')+b'fixture'
         self.digest=hashlib.sha256(self.image).hexdigest()
-        self.manifest={"complete":True,"package_sha256":self.package.sha256,"required":["playing"],"simulator":self.sim.info,
+        self.manifest={"complete":True,"package_sha256":self.package.sha256,"required":["playing"],"simulator":self.sim.info,"sdk":self.package.pin,
                        "scenes":[{"file":self.digest+".png","state":"playing","lang":"en","sha256":self.digest}]}
 
     def fetch(self,url,**kwargs):
@@ -35,6 +35,8 @@ class PreviewProof(unittest.TestCase):
     def test_tampered_pixels_incomplete_matrix_and_different_compiler_do_not_reuse(self):
         for edit in (lambda: self.manifest.update(complete=False),lambda: self.manifest.update(required=[]),
                      lambda: self.manifest.update(simulator={"source_sha":"other"}),
+                     lambda: self.manifest.update(sdk={"sha256":"c"*64}),
+                     lambda: self.manifest.pop("sdk"),
                      lambda: self.manifest['scenes'][0].update(sha256='0'*64)):
             original=json.loads(json.dumps(self.manifest)); edit()
             with patch('previews.expected',return_value=['playing']),patch('previews.build_opener') as opener:

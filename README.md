@@ -1,11 +1,15 @@
 # PlxNative Player HUD registry
 
 Declarative player layouts for [PlxNative](https://github.com/GLinnik21/plx-native).
-Start with [AUTHORING.md](AUTHORING.md), [the schema](schema/1.0.json) and an [example](examples/).
+A source directory becomes one deterministic `.plxhud` bundle through the native SDK.
+Start with [AUTHORING.md](AUTHORING.md), [the manifest schema](schema/manifest/1.0.json), [the HUD schema](schema/hud/1.0.json) and an [example](examples/).
 
 Reference and Minimal seed the registry. Validation uses the app's exact compiler, all shipped
 languages and the oldest compatible hash-pinned Ubuntu 24.04 x86_64 simulator. CI renders native state previews,
-checks original-byte hashes and prepares a Pages catalog with revocation and compatibility data.
+checks exact native-built archive hashes and prepares a Pages catalog with revocation and compatibility data.
+
+The source-pinned bundle SDK, native-emitted schemas and measured calibration profile are imported.
+The complete registry-native lint, authoring and preview acceptance run remains pending.
 
 The registry is public. `IMPLEMENTATION.md` records acceptance evidence. Main deploys the verified
 catalog to [GitHub Pages](https://glinnik21.github.io/plxnative-huds/) with the repository variable

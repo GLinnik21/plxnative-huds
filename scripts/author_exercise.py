@@ -1,33 +1,41 @@
-"""A new author starts from the public guide/schema/example and passes within two lint iterations."""
+"""Use the public source example and native member/pointer findings in two iterations."""
 import argparse
 import json
 from pathlib import Path
+import shutil
 import tempfile
-from catalog import Package, canonical, oldest, read_json
+
+from catalog import Source, oldest, read_json
 from simulator import Simulator, acquire, toolchains
 
 
 def exercise(root, cache):
-    # This fixture uses only the public starter's vocabulary: identity and palette edits. It
-    # deliberately includes one unknown root key, whose pointer the first lint must explain.
-    value = read_json(root / "examples/minimal.plxhud.json")
-    value.update(id="com.example.author-exercise", name="Author exercise", author="Example author", license="CC0-1.0")
-    value["unknown_author_option"] = True
-    package = Package(Path("unused"), value, b"", "unused")
-    pin = oldest(package, toolchains(root))
-    sim = Simulator(acquire(pin, cache), pin, root / pin["calibration"])
     with tempfile.TemporaryDirectory(prefix="hud-author-") as temporary:
-        path = Path(temporary) / "hud.plxhud.json"
-        path.write_bytes(canonical(value))
-        first = sim.lint(path)
-        if not any(f["path"] == "/unknown_author_option" for f in first["findings"]):
-            raise ValueError("first authoring lint did not identify the invalid option")
-        del value["unknown_author_option"]
-        path.write_bytes(canonical(value))
-        second = sim.lint(path)
-        if second["findings"]:
-            raise ValueError("public starter did not pass within two lint iterations")
-    return {"iterations": 2, "languages": sim.languages, "app_version": pin["app_version"], "source_sha": pin["source_sha"]}
+        directory = Path(temporary) / "author-exercise"
+        shutil.copytree(root / "examples/minimal", directory)
+        manifest_path = directory / "manifest.json"
+        manifest = read_json(manifest_path)
+        manifest.update(id="com.example.author-exercise", name="Author exercise", author="Example author", license="CC0-1.0")
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+        (directory / "README.md").write_text("Author exercise, CC0-1.0, Example author.\n")
+        pin = oldest(Source(directory, manifest), toolchains(root))
+        sim = Simulator(acquire(pin, cache), pin, root / pin["calibration"])
+        hud_path = directory / manifest["hud"]["entry"]
+        hud = read_json(hud_path)
+        hud["unknown_author_option"] = True
+        # Preserve insertion order, including every conditional object in the source.
+        hud_path.write_text(json.dumps(hud, ensure_ascii=False, indent=2) + "\n")
+        first = sim.lint(directory)
+        if not any(f["file"] == manifest["hud"]["entry"] and f["path"] == "/unknown_author_option" for f in first["findings"]):
+            raise ValueError("first authoring lint did not identify the member and invalid option")
+        del hud["unknown_author_option"]
+        hud_path.write_text(json.dumps(hud, ensure_ascii=False, indent=2) + "\n")
+        second = sim.lint(directory)
+        if second["findings"] or not second.get("package_sha256"):
+            raise ValueError("public starter did not pass within two native lint iterations")
+    return {"protocol": 1, "iterations": 2, "languages": sim.languages,
+            "app_version": pin["app_version"], "source_sha": pin["source_sha"],
+            "before": first, "after": second}
 
 
 if __name__ == "__main__":

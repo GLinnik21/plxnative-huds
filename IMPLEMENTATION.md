@@ -1,4 +1,63 @@
-# PR12 acceptance record
+# Bundle 1.0 acceptance
+
+The initial bundle contract separates manifest and HUD documents, both at version 1.0, and keeps
+seed plugin releases at 1.0.0. The registry implementation uses native-built `.plxhud` snapshots
+through validation, rendering and publication. Release rechecks consume published archive bytes.
+
+The published bundle SDK, native-emitted schema mirrors and source-bound calibration are imported.
+Registry-native lint, authoring, capture and publication acceptance remain pending the Ubuntu CI run.
+Python protocol fixtures exercise pipeline behavior with explicitly synthetic executables and data.
+
+- [x] Verify the SDK archive, manifest and file inventory, import both native-emitted schemas, and
+  derive the current host profile from the existing measured TV corpus.
+- [ ] Confirm the pin/bundle/binary contract through the registry's native SDK runner.
+- [ ] Pass the indexed native document/archive corpus and all-language package lint.
+- [ ] Record the two native authoring iterations with member and JSON-pointer findings.
+- [ ] Render and inspect the complete Reference and Minimal matrices and normal before/after differences.
+- [ ] Publish identical validated archive bytes and verify every download and preview hash.
+- [ ] Complete the release-dispatch/recheck path with the new SDK and exact published archives.
+
+## Bundle SDK import
+
+The source-pinned developer SDK was published from
+`017ff3ad29443e5ecf47e7c3d3b93f4625cf5c2c` under utility tag
+`hud-simulator-017ff3ad29443e5ecf47e7c3d3b93f4625cf5c2c`.
+The registry import verified its 39,127,843-byte archive, manifest and all 307 listed files through
+the existing `acquire` and `verify_bundle` helpers. [App SDK CI](https://github.com/GLinnik21/plx-native/actions/runs/41664064627)
+
+| Artifact | SHA-256 |
+|---|---|
+| SDK archive | `2636ee4f63a5cf2c5f1701ff5cb4af5e2a84abb80179e674da978587893167af` |
+| SDK manifest | `913f76629c24bbf27346b70deda1a9b24c1dc8a79366128e022abf5b46f407d3` |
+| Native manifest schema | `8782727f4fe4c029edb29201a522e693d636016883ff167e5a8ad9cfe419e9e9` |
+| Native HUD schema | `cff1151a179dc8b271c007f35de34ed1aa13cbf6a5df33757c0034c357130868` |
+| Linux text report | `97b33421b7e99e72e2c3b1db372203742a6d80e8f53b00beb80846f1797807ae` |
+| Existing TV text report | `dc2e1f388421d0a4eab49ab97ffc4dbd08ef252f4cdfa02eb5f94bdbe394d3fe` |
+
+`release_profile` compared all 12,276 rows directly with TV source `9266c34e7`, including every
+language, type rung and weight. Font identities, corpus coverage, all non-clock text and all type
+sizes matched. The 22 `clock.max.false`/`clock.max.true` samples across eleven languages use
+renderer-specific widest-clock exemplars. Their maximum widths are compared under the existing
+clock-envelope rule in `calibrate.py`.
+The new source-bound profile reproduces the measured 4–9 px per-rung margins. Its host report is
+retained byte for byte, and the profile binds both report hashes and the SDK's renderer identities.
+
+Both schema files were copied byte for byte from the verified SDK inventory. Stock Draft 2020-12
+checks passed for all 16 registry/example source documents. The SDK contains 22 native corpus
+cases, including four malformed archives. Execution of that corpus and the complete Reference and
+Minimal capture matrices is the pending registry-native CI gate.
+
+The SDK reports the seven-character source abbreviation `017ff3a`. A regression first exposed the
+registry wrapper's overly strict nine-character minimum. The wrapper accepts the native abbreviation
+and checks it against the full pinned source SHA, while archive, manifest and binary hashes remain
+part of SDK verification.
+
+## Earlier developer-tool acceptance record
+
+The following evidence describes the preceding inline-JSON developer tools and their actual
+runs. Bundle acceptance is tracked above.
+
+## PR12 acceptance record
 
 The owner made this registry public and enabled Actions to create compatibility pull requests.
 Repository token defaults remain read-only; write permissions are limited to the relevant jobs.

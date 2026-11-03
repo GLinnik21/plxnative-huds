@@ -45,10 +45,18 @@ fresh native evidence. Local compilation on each TV remains authoritative.
 The `60410e182`, `f1436ba` and `1c9a75db` profiles retain earlier iteration evidence. The preceding
 `1c9a75db` bundle was published by app CI run
 [41487654770](https://github.com/GLinnik21/plx-native/actions/runs/41487654770), with profile `3f9a62fc…`.
-The active bootstrap pin is source `3bc30f4edd3b392724968f9945dbef002cd646f2`, published by app CI run
+The preceding developer SDK was source `3bc30f4edd3b392724968f9945dbef002cd646f2`, published by app CI run
 [41515162200](https://github.com/GLinnik21/plx-native/actions/runs/41515162200). Its manifest-hash-
 named profile and host report (`4f88bbe2…`) compare all 12,276 rows directly with the native report,
 without carrying a changed corpus, and produce the same margins above. Only the source binding
 differs from the preceding host report; its metric rows and font hashes are identical. The pinned
 bundle includes both actual PMS chapter `tag` values in the long-title fixture and the shared
 UTF-8 buffer truncation fix.
+
+The active bundle SDK is source `017ff3ad29443e5ecf47e7c3d3b93f4625cf5c2c`, published by app CI run
+[41664064627](https://github.com/GLinnik21/plx-native/actions/runs/41664064627). Its manifest-hash-named
+profile and exact host report are `913f7662…`. The existing `release_profile` helper compares all
+12,276 new Linux rows directly with `tv-metrics.json` and reproduces the margins above.
+The profile records host source `017ff3a`, TV source `9266c34e7`, both report hashes, identical font
+identities and the current SDK renderer/type-scale identities. The original TV report is retained.
+Registry-native lint and captures are recorded separately in `IMPLEMENTATION.md` as they complete.

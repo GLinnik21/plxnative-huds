@@ -1,0 +1,13 @@
+{
+  "$schema": "https://plxnative.com/hud/schema/manifest/1.0.json",
+  "package_format": "1.0",
+  "id": "com.plxnative.examples.tabs",
+  "version": "1.0.0",
+  "name": "Tabs",
+  "author": "PlxNative",
+  "license": "CC0-1.0",
+  "hud": {
+    "format": "1.0",
+    "entry": "hud.json"
+  }
+}

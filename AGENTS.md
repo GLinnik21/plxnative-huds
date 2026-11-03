@@ -1,16 +1,29 @@
 # Player HUD registry
 
-Read `AUTHORING.md` and `schema/1.0.json`. Start with an example, not an invented vocabulary.
-Packages are data: one `huds/<reverse-DNS id>/hud.plxhud.json` and a README with license/contact.
-Do not translate or replace app-owned labels, implement playback, or add focus/key routing.
-Use the shared native commands, menus, sections, theme and type rungs defined by the format.
+Read `AUTHORING.md`, both generated schemas under `schema/manifest/` and `schema/hud/`, and an
+example source directory. A submission is `huds/<reverse-DNS id>/manifest.json`, `hud.json`, declared
+SVG resources and notices, plus a source-only README with license and contact information.
+The native SDK packs that directory into one `.plxhud` archive. Preserve authored JSON member
+order because state-keyed conditions use it. `catalog.canonical` is for registry reports and indexes.
 
-Run `python3 scripts/validate.py`; all shipped languages and all findings are required.
-Use the oldest compatible pinned simulator. Never suppress a finding, weaken the fixture corpus,
-change a calibration or move an immutable release pin to make a package pass.
-Render with `xvfb-run -a python3 scripts/previews.py` and inspect every generated state.
-Bump the HUD version for changed bytes. Do not commit generated previews or caches.
+Use the app-owned commands, labels, menus, focus, captions, theme and type rungs.
+Run `python3 scripts/validate.py` for native packaging, stock-schema agreement and all-language lint.
+Every finding requires correction. The oldest compatible pinned SDK must support both the package
+and HUD format, and its schemas, limits, source and binary must agree with its immutable artifact.
+Keep the SDK fixture corpus and measured text calibration authoritative.
 
-Preserve the original JSON bytes in publication. Revocations name a SHA-256 and reason.
-Automation and schema-mirror changes require maintainer review; they are not a HUD submission.
+Validation writes exact archives and their provenance to `out/packages/`. Render with
+`xvfb-run -a python3 scripts/previews.py` and inspect every state. Render and publication consume
+that same snapshot. Release rechecks enumerate published archives and authenticate them with the
+original SDK pins retained in their catalog entries and preview proofs. The native Rust packer is
+the production archive writer.
+
+Package and HUD formats independently begin at 1.0. Seed plugin versions begin at 1.0.0.
+After the initial bundle baseline, changed published bytes require a newer plugin version.
+Preserve full-archive hashes through install, lint, previews, publication and revocation.
+Generated previews, SDK caches and packed archives stay ignored.
+
+Automation and schema-mirror changes require maintainer review. Import schema mirrors from the
+real pinned SDK output. Keep native acceptance evidence pending until those commands and captures
+have run. Protocol-fixture tests establish transport behavior only.
 Never read or publish developer credentials or real Plex data. Synthetic mocks are mandatory.
