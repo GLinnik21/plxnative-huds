@@ -194,7 +194,7 @@ class Simulator:
         self.env["PYTHONDONTWRITEBYTECODE"] = "1"
         info = self.run("--hud-info")
         if (info.get("protocol") != 1 or not isinstance(info.get("source_sha"), str)
-            or not re.fullmatch("[0-9a-f]{9,40}", info["source_sha"])
+            or not re.fullmatch("[0-9a-f]{7,40}", info["source_sha"])
             or not pin["source_sha"].startswith(info["source_sha"])
             or info.get("app_version") != self.manifest.get("reported_version")) :
             raise Invalid("simulator binary does not report the pinned source/format")

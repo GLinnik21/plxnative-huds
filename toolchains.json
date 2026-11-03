@@ -3,16 +3,49 @@
   "simulators": [
     {
       "app_version": "0.10.0",
-      "bytes": 38938002,
-      "calibration": "calibration/4f88bbe246169dfb9e12388fcca5afec3465e436048930b8e6c9e490c08d9fa5.json",
+      "bytes": 39127843,
+      "calibration": "calibration/913f76629c24bbf27346b70deda1a9b24c1dc8a79366128e022abf5b46f407d3.json",
       "development": true,
-      "formats": [
-        "1.0"
+      "limits": {
+        "hud": {
+          "1.0": {
+            "json_bytes": 1048576,
+            "json_decode_bytes": 16777216,
+            "svg_bytes": 16384,
+            "svg_paths": 8
+          }
+        },
+        "package": {
+          "1.0": {
+            "artifact_bytes": 2097152,
+            "central_directory_bytes": 65536,
+            "entries": 128,
+            "manifest_bytes": 65536,
+            "member_bytes": 1048576,
+            "path_bytes": 128,
+            "path_depth": 8
+          }
+        }
+      },
+      "manifest_sha256": "913f76629c24bbf27346b70deda1a9b24c1dc8a79366128e022abf5b46f407d3",
+      "protocol": 1,
+      "schemas": {
+        "hud": {
+          "1.0": "https://plxnative.com/hud/schema/hud/1.0.json"
+        },
+        "manifest": {
+          "1.0": "https://plxnative.com/hud/schema/manifest/1.0.json"
+        }
+      },
+      "sha256": "2636ee4f63a5cf2c5f1701ff5cb4af5e2a84abb80179e674da978587893167af",
+      "source_sha": "017ff3ad29443e5ecf47e7c3d3b93f4625cf5c2c",
+      "supported_formats": [
+        {
+          "hud": "1.0",
+          "package": "1.0"
+        }
       ],
-      "manifest_sha256": "4f88bbe246169dfb9e12388fcca5afec3465e436048930b8e6c9e490c08d9fa5",
-      "sha256": "fb9468c54f918e00b11f0972e29543bbfa3d5e39ee86c8fa6316ce4017754dab",
-      "source_sha": "3bc30f4edd3b392724968f9945dbef002cd646f2",
-      "url": "https://github.com/GLinnik21/plx-native/releases/download/hud-simulator-3bc30f4edd3b392724968f9945dbef002cd646f2/plxnative-hud-simulator-linux-x86_64.tar.gz"
+      "url": "https://github.com/GLinnik21/plx-native/releases/download/hud-simulator-017ff3ad29443e5ecf47e7c3d3b93f4625cf5c2c/plxnative-hud-simulator-linux-x86_64.tar.gz"
     }
   ]
 }

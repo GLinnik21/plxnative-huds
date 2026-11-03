@@ -33,6 +33,22 @@ class Pinning(unittest.TestCase):
                 with self.assertRaises(Invalid):
                     Simulator(Path("fixture-sdk"), value)
 
+    def test_native_seven_character_source_prefix_is_bound_to_full_pin(self):
+        from test_bundles import pin
+        value = pin()
+        info = {**{key: value[key] for key in ("protocol", "supported_formats", "schemas", "limits")},
+                "app_version": value["app_version"], "source_sha": value["source_sha"][:7],
+                "languages": ["en"], "rungs": {"BODY": 28}}
+        manifest = {"reported_version": value["app_version"]}
+        with patch("simulator.verify_bundle", return_value=manifest), patch.object(Simulator, "run", return_value=info):
+            sdk = Simulator(Path("fixture-sdk"), value)
+            self.assertEqual(sdk.info["source_sha"], "a" * 7)
+        for source in ("a" * 6, "b" * 7):
+            with self.subTest(source=source), patch("simulator.verify_bundle", return_value=manifest), \
+                 patch.object(Simulator, "run", return_value={**info, "source_sha": source}):
+                with self.assertRaises(Invalid):
+                    Simulator(Path("fixture-sdk"), value)
+
     def test_manifest_and_binary_must_both_match_the_pin(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
