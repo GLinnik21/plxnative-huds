@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import subprocess
 import struct
+import tempfile
 import zlib
 
 from catalog import Invalid, canonical, read_json
@@ -93,14 +94,19 @@ def prepare(cache, demo):
         digest = video.with_suffix('.sha256')
         if not video.is_file() or not digest.is_file() or hashlib.sha256(video.read_bytes()).hexdigest() != digest.read_text().strip():
             temporary = video.with_name(name + '-video.tmp.mp4')
-            # Match ordinary video cadence so the SDK's streaming decoder receives enough
-            # access units to produce a picture before clockstop. A two-second GOP
-            # also bounds backward seeks within the SDK's ten-second preroll.
-            subprocess.run(['ffmpeg','-v','error','-y','-loop','1','-framerate','24','-i',str(ART / scene['file']),
-                '-f','lavfi','-i','anullsrc=r=48000:cl=stereo','-t','900',
-                '-vf','scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,setsar=1',
-                '-c:v','libx264','-preset','ultrafast','-tune','stillimage','-crf','24','-g','48','-pix_fmt','yuv420p',
-                '-threads','2','-filter_threads','1','-c:a','aac','-b:a','32k','-movflags','+faststart',str(temporary)],check=True,timeout=600)
+            # One two-second GOP, repeated without re-encoding, is the same still picture
+            # at ordinary video cadence for the entire native test timeline. It also bounds
+            # backward seeks within the SDK's ten-second preroll.
+            with tempfile.TemporaryDirectory(prefix='encode-', dir=directory) as scratch:
+                segment = Path(scratch) / 'segment.mp4'
+                subprocess.run(['ffmpeg','-v','error','-y','-loop','1','-framerate','24','-i',str(ART / scene['file']),
+                    '-t','2','-an','-vf','scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,setsar=1',
+                    '-c:v','libx264','-preset','ultrafast','-tune','stillimage','-crf','24','-g','48','-pix_fmt','yuv420p',
+                    '-threads','2','-filter_threads','1',str(segment)],check=True,timeout=120)
+                subprocess.run(['ffmpeg','-v','error','-y','-stream_loop','-1','-i',str(segment),
+                    '-f','lavfi','-i','anullsrc=r=48000:cl=stereo','-t','900',
+                    '-c:v','copy','-c:a','aac','-b:a','32k','-threads','2','-movflags','+faststart',str(temporary)],
+                    check=True,timeout=180)
             temporary.replace(video)
             digest.write_text(hashlib.sha256(video.read_bytes()).hexdigest()+'\n')
         assets[name+'-video'] = {"url": video.name, "sha256": hashlib.sha256(video.read_bytes()).hexdigest()}
