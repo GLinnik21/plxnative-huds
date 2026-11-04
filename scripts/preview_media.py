@@ -93,10 +93,12 @@ def prepare(cache, demo):
         digest = video.with_suffix('.sha256')
         if not video.is_file() or not digest.is_file() or hashlib.sha256(video.read_bytes()).hexdigest() != digest.read_text().strip():
             temporary = video.with_name(name + '-video.tmp.mp4')
+            # A two-second GOP bounds backward seeks within the SDK's ten-second preroll.
+            # The old thirty-second GOP started a 445s seek at 420s and missed clockstop.
             subprocess.run(['ffmpeg','-v','error','-y','-loop','1','-framerate','1','-i',str(ART / scene['file']),
                 '-f','lavfi','-i','anullsrc=r=48000:cl=stereo','-t','900',
                 '-vf','scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,setsar=1',
-                '-c:v','libx264','-preset','ultrafast','-tune','stillimage','-crf','24','-g','30','-pix_fmt','yuv420p',
+                '-c:v','libx264','-preset','ultrafast','-tune','stillimage','-crf','24','-g','2','-pix_fmt','yuv420p',
                 '-threads','2','-filter_threads','1','-c:a','aac','-b:a','32k','-movflags','+faststart',str(temporary)],check=True,timeout=600)
             temporary.replace(video)
             digest.write_text(hashlib.sha256(video.read_bytes()).hexdigest()+'\n')
