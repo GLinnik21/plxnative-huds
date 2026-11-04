@@ -273,7 +273,7 @@ def generate(root: Path, output: Path, previews: Path, base_url: str, compatibil
     for entry in entries:
         preview = entry["previews"][0]
         options = ''.join('<option value="' + html.escape(scene["url"],quote=True) + '">'
-                          + html.escape(scene["state"].replace("-"," ") + " · " + scene["lang"]) + '</option>'
+                          + html.escape(scene["state"].replace("-"," ") + " · " + scene["lang"] + (" · " + scene["variant"] if scene.get("variant") else "")) + '</option>'
                           for scene in entry["previews"])
         select = '<label>Preview state <select onchange="const card=this.closest(\'article\');card.querySelector(\'img\').src=this.value;card.querySelector(\'a.preview\').href=this.value">' + options + '</select></label>'
         cards.append(f'<article><h2>{html.escape(entry["name"])}</h2><p>{html.escape(entry["id"])} · {html.escape(entry["version"])}</p>'

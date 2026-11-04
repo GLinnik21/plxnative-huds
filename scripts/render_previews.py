@@ -10,6 +10,19 @@ import sys
 import preview_media
 
 
+def captures(matrix):
+    # Keep the original full validation matrix first. Extra frames are equivalent native
+    # scenes, never a tab switch disguised as a background carousel.
+    by_name = {spec['name']: spec for spec in matrix}
+    result = [(spec, preview_media.scene_for(spec), None) for spec in matrix]
+    for name, background in preview_media.variants(by_name):
+        spec = by_name[name]
+        if preview_media.scene_for(spec) != preview_media.GALLERY_BACKGROUNDS[name]:
+            raise ValueError('gallery primary background differs from its declared variant plan')
+        result.append((spec, background, background))
+    return result
+
+
 def render(sdk, binary, hud, output, cache, only=None, sdk_pin=None):
     if sdk_pin is not None:
         from simulator import verify_bundle
@@ -28,13 +41,17 @@ def render(sdk, binary, hud, output, cache, only=None, sdk_pin=None):
             raise ValueError('unknown preview scene selection')
         output.mkdir(parents=True,exist_ok=True)
         scenes=[]
-        for spec in selected:
+        for spec,background,variant in captures(selected):
             png,log=native.screenshots.capture(binary,native.capture_scene(spec),native.DEFAULTS,'after-rain',False,
-                prepare=preview_media.fixture(spec,package.path,native,directory),assets=sdk/'pkg')
-            name=spec['name']+'.png'
+                prepare=preview_media.fixture(spec,package.path,native,directory,background),assets=sdk/'pkg')
+            stem=spec['name']+('--'+variant if variant else '')
+            name=stem+'.png'
             (output/name).write_bytes(png)
-            (output/(spec['name']+'.log')).write_text(log)
-            scenes.append({'file':name,'sha256':hashlib.sha256(png).hexdigest(),'state':spec['name'],'lang':spec['lang']})
+            (output/(stem+'.log')).write_text(log)
+            scene={'file':name,'sha256':hashlib.sha256(png).hexdigest(),'state':spec['name'],'lang':spec['lang']}
+            if variant:
+                scene['variant']=variant
+            scenes.append(scene)
         manifest={'protocol':1,'package_sha256':package.sha256,'simulator':package.info,'media':preview_media.proof(),
             'required':[s['name'] for s in matrix],'complete':len(selected)==len(matrix),'scenes':scenes}
         if sdk_pin is not None:

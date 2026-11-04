@@ -60,3 +60,21 @@ class GeneratedMedia(unittest.TestCase):
         offset=image.index(b'IDAT')
         size=int.from_bytes(image[offset-4:offset],'big')
         self.assertEqual(zlib.decompress(image[offset+4:offset+4+size]),b'\0'*5)
+
+    def test_gallery_background_variants_keep_the_native_scene_fixed(self):
+        import render_previews
+        primary = {'name':'sections-3-movie-paused','background':'dark','open':3,'lang':'en'}
+        captures = render_previews.captures([primary])
+        self.assertEqual([background for spec, background, variant in captures], ['daylight','coast','neon'])
+        self.assertTrue(all(spec is primary for spec, background, variant in captures))
+        self.assertEqual([variant for spec, background, variant in captures], [None,'coast','neon'])
+
+    def test_background_override_does_not_rewrite_the_native_fixture(self):
+        spec={'name':'up-next','background':'dark','open':0,'slot':'up_next'}
+        source={'Media':[{'Part':[{'id':103}]}]}
+        lib=SimpleNamespace(items={102:source},_verified_media=Mock(return_value=({},900000)))
+        native=SimpleNamespace(fixture=Mock(return_value=Mock()))
+        preview_media.fixture(spec,Path('sample.plxhud'),native,Path('generated'),'coast')(SimpleNamespace(lib=lib),Path('runtime'))
+        native.fixture.assert_called_once_with(spec,Path('sample.plxhud'))
+        lib._verified_media.assert_called_once_with(Path('generated/src/coast-video.mp4'),102,103)
+        self.assertEqual(spec['slot'],'up_next')

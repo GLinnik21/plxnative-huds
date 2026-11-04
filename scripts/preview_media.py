@@ -135,12 +135,26 @@ def prepare(cache, demo):
     return directory, path
 
 
-def fixture(spec, hud, native, directory):
+# The three gallery slots keep their native state while their background changes.
+GALLERY_BACKGROUNDS = {
+    'sections-0-movie-paused-no-chapters': 'coast',
+    'sections-3-movie-paused': 'daylight',
+    'up-next': 'neon',
+}
+
+
+def variants(names):
+    return [(name, background) for name in names if name in GALLERY_BACKGROUNDS
+            for background in ('coast', 'daylight', 'neon')
+            if background != GALLERY_BACKGROUNDS[name]]
+
+
+def fixture(spec, hud, native, directory, background=None):
     original = native.fixture(spec, hud)
     def apply(pms, runtime):
         source = pms.lib.items[102]
         part = source['Media'][0]['Part'][0]['id']
-        video = directory/'src'/(scene_for(spec)+'-video.mp4')
+        video = directory/'src'/((background or scene_for(spec))+'-video.mp4')
         media, duration = pms.lib._verified_media(video,102,part)
         source.update(Media=[media],duration=duration)
         # The SDK supplies the real player states, menu geometry and episode setup unchanged.
