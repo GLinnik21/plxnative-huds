@@ -26,4 +26,9 @@ Generated previews, SDK caches and packed archives stay ignored.
 Automation and schema-mirror changes require maintainer review. Import schema mirrors from the
 real pinned SDK output. Keep native acceptance evidence pending until those commands and captures
 have run. Protocol-fixture tests establish transport behavior only.
+The published catalog is `index.json` plus `index.signed`, its Ed25519-signed copy with a `serial`
+(`IMPLEMENTATION.md`, "Signed index"). `keys.json` lists the two accepted public keys the app compiles
+in; changing it, `scripts/sign_index.py` or the workflow's signing step is a rotation or automation
+change that needs maintainer review. Tests sign only with throwaway keys they generate. Never read, print,
+set or rotate the Actions secret `HUD_INDEX_ED25519_KEY`, or pass it to any step but the signing one.
 Never read or publish developer credentials or real Plex data. Synthetic mocks are mandatory.

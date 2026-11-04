@@ -52,6 +52,73 @@ registry wrapper's overly strict nine-character minimum. The wrapper accepts the
 and checks it against the full pinned source SHA, while archive, manifest and binary hashes remain
 part of SDK verification.
 
+## Signed index
+
+The registry signs its index so the app can trust a catalog it fetched over a CDN. The contract
+below is shared with the app, which compiles in the same two public keys.
+
+- `index.json` keeps its shape and gains one top-level `"serial"`: the UTC epoch seconds at which the
+  publish run built it, an unsigned integer. PR13-era apps ignore the field. `HUD_INDEX_SERIAL` is the
+  single place the workflow sets it (`date -u +%s`, once per `stage` job); `scripts/publish.py` also takes
+  `--serial`. `catalog.generate` requires it, so the index is a pure function of its inputs and a pinned
+  serial reproduces it byte for byte. Runs of one ref are serialized by the workflow's `concurrency`
+  group, so the serial rises from deploy to deploy.
+- `index.signed` is one file in two parts, so a signature and the bytes it covers can never come from
+  different deploys (Pages serves `max-age=600`; two files could skew). Line 1 is a compact JSON header
+  and a single `\n`: `{"format":1,"key":"<16 hex>","sig":"<128 hex>"}`, exactly those three keys.
+  Everything after that first `\n` is the exact bytes of `index.json`. `sig` is pure Ed25519
+  (RFC 8032: no prehash, no context, no prefix) over those bytes. `key` is the first 16 hex of SHA-256
+  over the signer's raw 32-byte public key.
+- `scripts/sign_index.py` reads `index.json` once, signs that buffer, writes `index.signed` from the
+  same buffer, then re-verifies the written file against `keys.json` and confirms `index.json` did not
+  change underneath it. It refuses to sign when the secret's public half is not in `keys.json`.
+  `scripts/check_site.py --require-signed` repeats the check on the staged directory.
+- Only the `Sign the index` step of the `stage` job receives the private key, as the environment
+  variable `HUD_INDEX_ED25519_KEY` (PKCS#8 PEM, the repository's Actions secret). That step runs under
+  exactly the condition that gates the Pages upload (a push to `main` with `PUBLISH_PAGES == 'true'`, or a
+  manual `publish`), and fails when the secret is empty: an unsigned index is never deployed. Pull-request
+  and non-publishing runs build and verify everything except the signature. The key goes from the
+  environment into memory; it is never echoed, never written to a file, never passed to a child process.
+- Signing uses the Python `cryptography` package, pinned exactly in `requirements.txt` with the two
+  packages it loads at import. The runner's `openssl pkeyutl -rawin` was the alternative; it was not
+  chosen because macOS ships LibreSSL, which cannot load an Ed25519 key, so the suite could not
+  exercise the real signing path on a developer machine, and an OpenSSL signer would have to hand the
+  key to a child process through a file or descriptor. Tests sign with throwaway keys they generate;
+  the stock OpenSSL 3 check below is exercised against their output when OpenSSL 3 is available.
+
+| role | key id | raw public key (hex, 32 bytes) |
+|---|---|---|
+| primary (signs today) | `4fe9b53b661ff2e8` | `45ef4dd7f0ba0b0531014245a4b9ecbc1b1c1ebc848fa2b5d7ae5bc537c6658a` |
+| standby (rotation) | `437641d803b6932b` | `c80a7613abd76a596c4c21875c4abb280c1b0e279a79b2c43e86ce9e0b41a792` |
+
+`keys.json` mirrors this table for the publisher's own check; `tests/test_signed_index.py` pins every
+id to its key. The standby's private key is held offline by the maintainer, in no repository or CI.
+
+Rotation, planned or after a suspected compromise: put the standby's private key into
+`HUD_INDEX_ED25519_KEY` and publish (every shipped app already accepts the standby). Then generate a
+new standby, ship an app release whose two accepted keys are {old standby, new standby}, and drop the
+old primary from `keys.json` and the app. A key is never removed from the app before a release that
+accepts its successor has shipped.
+
+Verify a published file with stock OpenSSL 3 (macOS's own `openssl` is LibreSSL and cannot) and `xxd`.
+`head -n 1 index.signed` shows which key signed; set `PUBLIC_KEY_HEX` to that row of `keys.json`:
+
+```sh
+curl -fsSLO https://glinnik21.github.io/plxnative-huds/index.signed
+```
+
+<!-- verify:begin -->
+```sh
+head -n 1 index.signed | sed 's/.*"sig":"\([0-9a-f]*\)".*/\1/' | xxd -r -p > index.sig
+tail -n +2 index.signed > index.bytes
+printf '302a300506032b6570032100%s' "$PUBLIC_KEY_HEX" | xxd -r -p | openssl pkey -pubin -inform DER -out pub.pem
+openssl pkeyutl -verify -pubin -inkey pub.pem -rawin -in index.bytes -sigfile index.sig
+```
+<!-- verify:end -->
+
+It prints `Signature Verified Successfully`; any changed byte makes it fail. `index.bytes` is then the
+exact `index.json` of that deploy.
+
 ## Earlier developer-tool acceptance record
 
 The following evidence describes the preceding inline-JSON developer tools and their actual

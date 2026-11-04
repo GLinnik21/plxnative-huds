@@ -8,8 +8,11 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import catalog
+import sign_index
 from check_site import check
 from test_bundles import metadata, pin
+
+SERIAL = 1_788_000_000
 
 
 class CatalogTests(unittest.TestCase):
@@ -89,8 +92,8 @@ class CatalogTests(unittest.TestCase):
         package = self.package()
         previews = self.preview(package)
         a, b = self.root / "a", self.root / "b"
-        first = catalog.generate(self.root, a, previews, "https://example.invalid/huds", {}, [package])
-        second = catalog.generate(self.root, b, previews, "https://example.invalid/huds", {}, [package])
+        first = catalog.generate(self.root, a, previews, "https://example.invalid/huds", {}, [package], serial=SERIAL)
+        second = catalog.generate(self.root, b, previews, "https://example.invalid/huds", {}, [package], serial=SERIAL)
         self.assertEqual(first, second)
         self.assertEqual((a / "index.json").read_bytes(), (b / "index.json").read_bytes())
         self.assertEqual((a / "p" / (package.sha256+".plxhud")).read_bytes(), package.content)
@@ -106,6 +109,52 @@ class CatalogTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             check(a)
 
+    def test_the_index_carries_the_serial_and_changes_only_with_it(self):
+        package = self.package()
+        previews = self.preview(package)
+        a, b, c = self.root / "a", self.root / "b", self.root / "c"
+        first = catalog.generate(self.root, a, previews, "https://example.invalid/huds", {}, [package], serial=SERIAL)
+        catalog.generate(self.root, b, previews, "https://example.invalid/huds", {}, [package], serial=SERIAL + 1)
+        later = catalog.generate(self.root, c, previews, "https://example.invalid/huds", {}, [package], serial=SERIAL)
+        self.assertEqual(first["serial"], SERIAL)
+        self.assertEqual(json.loads((a / "index.json").read_bytes())["serial"], SERIAL)
+        self.assertEqual(first, later)
+        self.assertEqual((a / "index.json").read_bytes(), (c / "index.json").read_bytes())
+        other = json.loads((b / "index.json").read_bytes())
+        self.assertEqual(other.pop("serial"), SERIAL + 1)
+        expected = json.loads((a / "index.json").read_bytes())
+        expected.pop("serial")
+        self.assertEqual(other, expected, "the serial is the only difference")
+        self.assertEqual(set(first), {"format", "entries", "revoked", "serial"})
+
+    def test_a_serial_must_be_an_unsigned_integer_and_is_never_defaulted(self):
+        package = self.package()
+        previews = self.preview(package)
+        for value in (-1, True, 1.5, "1788000000", None, 2 ** 53):
+            with self.subTest(serial=value), self.assertRaises(catalog.Invalid):
+                catalog.generate(self.root, self.root / "bad", previews, "https://example.invalid", {}, [package], serial=value)
+            self.assertFalse((self.root / "bad" / "index.json").exists())
+        with self.assertRaises(TypeError):
+            catalog.generate(self.root, self.root / "bad", previews, "https://example.invalid", {}, [package])
+
+    def test_a_generated_catalog_signs_and_passes_the_deploy_check(self):
+        from test_signed_index import keys_document, throwaway
+        package = self.package()
+        out = self.root / "a"
+        catalog.generate(self.root, out, self.preview(package), "https://example.invalid/huds", {}, [package], serial=SERIAL)
+        (out / "CREDITS.md").write_text("Protocol fixture\n")
+        _, pem, public = throwaway()
+        keys = self.root / "keys.json"
+        keys.write_bytes(keys_document(public, throwaway()[2]))
+        self.assertEqual(check(out, keys=keys), 1, "an unsigned staging catalog passes")
+        with self.assertRaises(AssertionError):
+            check(out, require_signed=True, keys=keys)
+        index = (out / "index.json").read_bytes()
+        sign_index.sign_site(out, keys, pem)
+        self.assertEqual(check(out, require_signed=True, keys=keys), 1)
+        self.assertEqual((out / "index.signed").read_bytes().partition(b"\n")[2], index)
+        self.assertEqual((out / "index.json").read_bytes(), index, "signing leaves index.json untouched")
+
     def test_bad_preview_hash_or_path_never_publishes_an_index(self):
         package = self.package()
         previews = self.preview(package)
@@ -116,14 +165,14 @@ class CatalogTests(unittest.TestCase):
             manifest_path.write_bytes(catalog.canonical(manifest))
             output = self.root / "published"
             with self.assertRaises(catalog.Invalid):
-                catalog.generate(self.root, output, previews, "https://example.invalid/huds", {}, [package])
+                catalog.generate(self.root, output, previews, "https://example.invalid/huds", {}, [package], serial=SERIAL)
             self.assertFalse((output / "index.json").exists())
 
     def test_revoked_hash_is_removed_but_reason_remains_available(self):
         package = self.package()
         revocation = {"sha256": package.sha256, "reason": "Author withdrew this version"}
         (self.root / "revoked.json").write_bytes(catalog.canonical([revocation]))
-        index = catalog.generate(self.root, self.root / "out", self.root / "no-previews", "https://example.invalid", {}, [package])
+        index = catalog.generate(self.root, self.root / "out", self.root / "no-previews", "https://example.invalid", {}, [package], serial=SERIAL)
         self.assertEqual(index["entries"], [])
         self.assertEqual(index["revoked"], [revocation])
 
@@ -132,7 +181,7 @@ class CatalogTests(unittest.TestCase):
         self.write()
         package = self.package()
         compatibility = {"packages": {package.sha256: {"app_max": "0.12.0", "unfit": [{"from": "0.12.0", "langs": ["de"]}]}}}
-        index = catalog.generate(self.root, self.root / "out", self.preview(package), "https://example.invalid", compatibility, [package])
+        index = catalog.generate(self.root, self.root / "out", self.preview(package), "https://example.invalid", compatibility, [package], serial=SERIAL)
         self.assertEqual(index["entries"][0]["app"]["max"], "0.11.0")
         self.assertEqual(index["entries"][0]["unfit"], [{"from": "0.12.0", "langs": ["de"]}])
         self.assertEqual(package.path.read_bytes(), package.content)

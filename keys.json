@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "keys": [
+    {
+      "hex": "45ef4dd7f0ba0b0531014245a4b9ecbc1b1c1ebc848fa2b5d7ae5bc537c6658a",
+      "id": "4fe9b53b661ff2e8",
+      "role": "primary"
+    },
+    {
+      "hex": "c80a7613abd76a596c4c21875c4abb280c1b0e279a79b2c43e86ce9e0b41a792",
+      "id": "437641d803b6932b",
+      "role": "standby"
+    }
+  ]
+}
