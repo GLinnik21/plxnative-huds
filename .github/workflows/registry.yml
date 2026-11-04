@@ -148,7 +148,7 @@ jobs:
         run: echo "HUD_INDEX_SERIAL=$(date -u +%s)" >> "$GITHUB_ENV"
       - name: Verify every preview proof and published byte
         run: |
-          python3 scripts/publish.py --base-url https://glinnik21.github.io/plxnative-huds
+          .venv/bin/python scripts/publish.py --base-url https://glinnik21.github.io/plxnative-huds
           .venv/bin/python scripts/check_site.py out/site
       - name: Sign the index
         if: (github.event_name == 'push' && vars.PUBLISH_PAGES == 'true') || inputs.publish
