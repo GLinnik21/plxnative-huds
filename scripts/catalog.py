@@ -206,14 +206,27 @@ def revoked(root: Path) -> list[dict]:
     return sorted(values, key=lambda item: item["sha256"])
 
 
+def check_serial(value) -> int:
+    """The publish run's UTC epoch seconds. Unsigned, and small enough for every JSON reader to hold exactly."""
+    if type(value) is not int or not 0 <= value < 2 ** 53:
+        raise Invalid(f"index serial must be an unsigned integer below 2**53, got {value!r}")
+    return value
+
+
 def public_origin(url: str):
     split = urlsplit(url)
     if split.scheme != "https" or not split.hostname or split.username or split.password or split.query or split.fragment:
         raise Invalid("catalog base URL must be an HTTPS origin/path without credentials, query or fragment")
 
 
-def generate(root: Path, output: Path, previews: Path, base_url: str, compatibility: dict, built: list[Package]) -> dict:
-    """Copy original pack bytes and verified previews. Call only after lint and rendering succeed."""
+def generate(root: Path, output: Path, previews: Path, base_url: str, compatibility: dict, built: list[Package],
+             *, serial: int) -> dict:
+    """Copy original pack bytes and verified previews. Call only after lint and rendering succeed.
+
+    `serial` is the publish run's UTC epoch seconds, fixed once by the caller so the index is a pure
+    function of its inputs. It is required: an index without one cannot be accepted by the app.
+    """
+    check_serial(serial)
     public_origin(base_url)
     base_url = base_url.rstrip("/")
     tombstones = revoked(root)
@@ -266,7 +279,7 @@ def generate(root: Path, output: Path, previews: Path, base_url: str, compatibil
                         "sdk": package.pin,
                         "url": f"{base_url}/p/{package.sha256}.plxhud", "previews": art,
                         "unfit": fit.get("unfit", [])})
-    index = {"format": 1, "entries": entries, "revoked": tombstones}
+    index = {"format": 1, "entries": entries, "revoked": tombstones, "serial": serial}
     (output / "index.json").write_bytes(canonical(index))
     (output / "revoked.json").write_bytes(canonical(tombstones))
     cards = []

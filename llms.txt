@@ -8,6 +8,7 @@ Declarative player layouts for the native Plex client on rooted LG webOS TVs.
 - The generated HUD schema owns rendering. [HUD 1.0](schema/hud/1.0.json)
 - Minimal supplies a complete starting source directory. [Minimal](examples/minimal/)
 - Reference supplies inline sections and native menu openers. [Reference](examples/reference/)
+- The published `index.json` carries a `serial`; `index.signed` is its Ed25519 signature plus the exact bytes, verified against the two keys in [keys.json](keys.json). Authors do not sign. [Signed index](IMPLEMENTATION.md#signed-index)
 - The app's format guide defines supported vocabulary and invariants. [Format guide](https://github.com/GLinnik21/plx-native/blob/main/docs/hud-plugins.md)
 
 Use the oldest compatible SDK pinned in toolchains.json and lint every shipped language.

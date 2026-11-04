@@ -1,2 +1,7 @@
 # Stock draft-2020-12 schema agreement; the app remains the authoritative full validator.
 jsonschema==4.26.0
+# Ed25519 signing of the published index (scripts/sign_index.py). The private key is read from the
+# environment into memory; cryptography and the two packages it loads at import are pinned exactly.
+cryptography==50.0.2
+cffi==2.1.1
+pycparser==3.12

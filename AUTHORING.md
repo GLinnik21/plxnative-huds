@@ -99,9 +99,14 @@ failures cap the catalog at the last passing app, and later successful releases 
 Authored app bounds come from the archive, so catalog compatibility ceilings allow future rechecks.
 The TV retains its own fit and cost checks when selecting a package.
 
-Publication writes `index.json`, `p/<sha256>.plxhud`, hashed previews and revocation reasons.
+Publication writes `index.json` (with a `serial`, the UTC epoch seconds of the publish run),
+`index.signed`, `p/<sha256>.plxhud`, hashed previews and revocation reasons. `index.signed` is the
+publisher's Ed25519 signature and the exact `index.json` bytes in one file; the app trusts only that
+file, against two public keys listed in `keys.json`. Authors never sign anything: the registry's CI
+holds the key and signs only when it deploys. `IMPLEMENTATION.md` gives the format, the rotation plan and
+the stock `openssl` command that verifies it.
 Main deploys when `PUBLISH_PAGES` is true. Manual publication is explicit. With publication disabled,
-CI retains the same verified catalog artifact.
+CI retains the same verified catalog artifact, unsigned.
 
 Future package minors can raise transport/member limits or add compression. Future HUD minors
 can add bitmap, font and plugin-localization semantics with their own decode and rendering budgets.

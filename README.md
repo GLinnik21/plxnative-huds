@@ -11,6 +11,12 @@ checks exact native-built archive hashes and prepares a Pages catalog with revoc
 The source-pinned bundle SDK, native-emitted schemas and measured calibration profile are imported.
 The complete registry-native lint, authoring and preview acceptance run remains pending.
 
+The published index is signed. `index.signed` holds the exact bytes of `index.json` (which carries a
+`serial`, the publish run's UTC epoch seconds) under an Ed25519 signature from one of the two public
+keys in [keys.json](keys.json); the app accepts only that file. Only a deploying run of the main
+workflow holds the signing key. `IMPLEMENTATION.md` gives the format, the key rotation plan and the
+stock `openssl` command that verifies a download.
+
 The registry is public. `IMPLEMENTATION.md` records acceptance evidence. Main deploys the verified
 catalog to [GitHub Pages](https://glinnik21.github.io/plxnative-huds/) with the repository variable
 `PUBLISH_PAGES=true`. Pushes also retain the catalog as a CI artifact. Disabling that variable

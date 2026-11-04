@@ -127,6 +127,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Install the pinned schema and signing libraries
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install -r requirements.txt
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: registry-validation
@@ -140,10 +144,20 @@ jobs:
         with:
           path: .cache/simulators
           key: hud-validator-${{ runner.os }}-${{ hashFiles('toolchains.json') }}
+      - name: Fix the serial of this publish run
+        run: echo "HUD_INDEX_SERIAL=$(date -u +%s)" >> "$GITHUB_ENV"
       - name: Verify every preview proof and published byte
         run: |
-          python3 scripts/publish.py --base-url https://glinnik21.github.io/plxnative-huds
-          python3 scripts/check_site.py out/site
+          .venv/bin/python scripts/publish.py --base-url https://glinnik21.github.io/plxnative-huds
+          .venv/bin/python scripts/check_site.py out/site
+      - name: Sign the index
+        if: (github.event_name == 'push' && vars.PUBLISH_PAGES == 'true') || inputs.publish
+        env:
+          HUD_INDEX_ED25519_KEY: ${{ secrets.HUD_INDEX_ED25519_KEY }}
+        run: .venv/bin/python scripts/sign_index.py out/site
+      - name: Verify the signed index against the accepted keys
+        if: (github.event_name == 'push' && vars.PUBLISH_PAGES == 'true') || inputs.publish
+        run: .venv/bin/python scripts/check_site.py out/site --require-signed
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: registry-catalog
