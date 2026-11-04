@@ -1,0 +1,32 @@
+{
+  "format": 1,
+  "scenes": [
+    {
+      "id": "coast",
+      "file": "coast.png",
+      "sha256": "b6937af0722136aa09250a3c9b5798e6f273a3944b2a5b45e833c4292c85d1df",
+      "width": 1672,
+      "height": 941,
+      "origin": "Original image generated with OpenAI image generation for PlxNative",
+      "prompt": "Use case: photorealistic-natural. Asset type: original cinematic still for a fictional film in a player-interface design mockup. Create a new, original scene: a solitary traveler in a muted rust-orange raincoat, seen from behind on a dark coastal footpath after rain, looking toward a small warm-lit lighthouse across a misty bay at blue hour. Wide landscape 16:9 composition, 1920x1080 framing, natural 35mm cinematography, restrained blue-gray sea and clouds, subtle amber light, realistic rock and wet-grass textures. Keep the lower quarter relatively dark and visually quiet so player controls can be placed over it later. Edge-to-edge image, no letterbox bars. No existing film characters, franchise imagery, celebrity likenesses, logos, text, subtitles, user-interface graphics, or watermarks. This should be a believable, understated frame from an imaginary independent adventure film, not an illustration or a poster."
+    },
+    {
+      "id": "daylight",
+      "file": "daylight.png",
+      "sha256": "9e5d6beb8e6248f338edd3f28d405bc9242dc88fb3ebb36402cc2eb047cfb0f4",
+      "width": 1672,
+      "height": 941,
+      "origin": "Original image generated with OpenAI image generation for PlxNative",
+      "prompt": "Use case: stylized-concept. Asset type: original cinematic frame used as the background of a media-player UI preview. Create a new, original hand-painted animated-film environment: a quiet hillside village of simple pale-stone houses and ochre roofs overlooking a turquoise mountain lake on a clear summer morning, distant blue mountains, warm sunlit plaster and soft painterly foliage. Wide landscape 16:9 frame, edge-to-edge, no letterbox bars, polished traditional animation background painting, bright cream and warm yellow tones contrasting with cool water. Natural composition with readable open areas; no dramatic focal detail in the bottom quarter. No characters, text, logos, subtitles, UI, watermarks, or imagery from any existing film or franchise. This is a still from an imaginary film, not a poster."
+    },
+    {
+      "id": "neon",
+      "file": "neon.png",
+      "sha256": "3a61b85dd5b89a7bc81227f9439d5551f2edee10661d31f5b9d64511577d90e9",
+      "width": 1672,
+      "height": 941,
+      "origin": "Original image generated with OpenAI image generation for PlxNative",
+      "prompt": "Use case: photorealistic-natural. Asset type: original cinematic frame used as the background of a media-player UI preview. Create a new, original scene of an empty rain-soaked city street at night, low buildings with soft cyan and magenta practical lights reflected in wet asphalt, a distant elevated train bridge fading into mist, understated contemporary cinematography and realistic textures. Wide landscape 16:9 frame, edge-to-edge, no letterbox bars, dark charcoal foreground with saturated small pools of light, restrained rather than futuristic spectacle. Keep the bottom quarter visually calm. No people, readable signs, text, brands, logos, subtitles, UI, watermarks, or recognizable buildings or imagery from an existing film or franchise. A believable original still from an imaginary film, not an illustration or poster."
+    }
+  ]
+}
