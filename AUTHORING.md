@@ -54,6 +54,12 @@ The SDK advertises the complete versioned limits, including the initial 2 MiB ar
    previews and visual differences. Following the initial bundle baseline, increment the plugin
    version whenever its published archive bytes change.
 
+The registry uses its original AI-generated coast, painted village and rain-lit city for every
+preview frame, chapter thumbnail and information image. The pinned SDK still supplies the native
+HUD and complete state matrix. Preview provenance binds the source images and fixture recipe;
+old film-based renders cannot be reused. Generation prompts are in `assets/preview-scenes/scenes.json`.
+
+
 Validation selects the oldest pinned SDK that supports the manifest's package/HUD version pair
 and app bounds. It invokes the native packer once per source and writes the exact archive and
 provenance to `out/packages/`. Rendering and publishing consume that snapshot. Run validation

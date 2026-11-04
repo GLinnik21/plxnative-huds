@@ -13,6 +13,7 @@ from urllib.error import URLError
 import sys
 from catalog import Invalid, canonical, oldest, packages, public_origin, read_json, require_sources, revoked
 from simulator import SecureRedirect, Simulator, acquire, toolchains
+import preview_media
 
 
 def expected(sim, package):
@@ -25,13 +26,19 @@ def expected(sim, package):
 def verify_provenance(sim, package, manifest, *, published=False):
     if (manifest.get("package_sha256") != package.sha256 or not manifest.get("complete")
         or manifest.get("simulator") != sim.info
-        or (published or "sdk" in manifest) and manifest.get("sdk") != package.pin):
+        or manifest.get("sdk") != package.pin):
         raise Invalid("preview provenance differs from the package's original SDK")
+
+
+def verify_media(manifest):
+    if manifest.get("media") != preview_media.proof():
+        raise Invalid("preview media differs from the generated scenes and current fixture recipe")
 
 
 def verify(sim, package, directory, *, published=False):
     manifest = read_json(directory / "manifest.json")
     verify_provenance(sim, package, manifest, published=published)
+    verify_media(manifest)
     names = expected(sim, package)
     actual = [scene["state"] for scene in manifest.get("scenes", [])]
     if manifest.get("required") != names or sorted(actual) != sorted(names) or len(set(actual)) != len(actual):
@@ -93,6 +100,8 @@ def published(sim, package, directory, base_url):
         try:
             fetch("manifest.json",2*1024*1024)
             manifest = read_json(stage / "manifest.json")
+            verify_provenance(sim,package,manifest,published=True)
+            verify_media(manifest)
             for scene in manifest["scenes"]:
                 name = scene["file"]
                 if Path(name).name != name or not name.endswith(".png"):
@@ -111,7 +120,6 @@ def render(root, cache, output, snapshot=Path("out/packages"), previous_snapshot
     pins = toolchains(root)
     rejected = {item["sha256"] for item in revoked(root)}
     before = {p.id: p for p in packages(previous_snapshot)} if previous_snapshot else {}
-    prepared = set()
     candidates = packages(snapshot)
     require_sources(root, candidates)
     if only is not None:
@@ -127,24 +135,32 @@ def render(root, cache, output, snapshot=Path("out/packages"), previous_snapshot
         sim = Simulator(local or acquire(pin, cache), pin, root / pin["calibration"])
         sim.inspect(package)
         directory = output / package.sha256
-        reused = reuse_url is not None and published(sim,package,directory,reuse_url)
+        earlier = before.get(package.id)
+        reused = False
+        if earlier and previous_previews and earlier.sha256 == package.sha256:
+            previous = previous_previews / earlier.sha256
+            try:
+                verify(sim,package,previous)
+            except (Invalid,OSError,ValueError,KeyError):
+                pass
+            else:
+                if directory.exists():
+                    shutil.rmtree(directory)
+                shutil.copytree(previous,directory)
+                reused = True
+        if not reused:
+            reused = reuse_url is not None and published(sim,package,directory,reuse_url)
         if reused:
-            print("Reused complete pinned previews:",package.id,flush=True)
+            print("Reused complete pinned previews with matching generated media:",package.id,flush=True)
         else:
-            env = dict(sim.env)
-            env["PLXNATIVE_DEMO_CACHE"] = str((cache.parent / "demo-library").resolve())
-            if pin["sha256"] not in prepared:
-                for action in ("fetch", "derive"):
-                    subprocess.run([sys.executable, str(sim.root / "tools/demo_library.py"), action], env=env, check=True, timeout=1200)
-                prepared.add(pin["sha256"])
             if directory.exists():
                 shutil.rmtree(directory)
-            subprocess.run([sys.executable, str(sim.root / "tools/hud_preview.py"), "--bin", str(sim.binary),
-                            "--hud", str(package.path.resolve()), "--out", str(directory.resolve())],
-                           # A full matrix has its own budget; each scene still has the
-                           # app tool's independent 180-second settle deadline.
-                           env=env, check=True, timeout=90 * 60)
-            verify(sim, package, directory)
+            subprocess.run([sys.executable,str(Path(__file__).with_name('render_previews.py')),
+                '--sdk',str(sim.root),'--bin',str(sim.binary),'--hud',str(package.path.resolve()),
+                '--out',str(directory.resolve()),'--cache',str((cache.parent/'generated-preview-media').resolve()),
+                '--sdk-pin',canonical(package.pin).decode()],
+                env=sim.env,check=True,timeout=90*60)
+            verify(sim,package,directory)
         earlier = before.get(package.id)
         if earlier and previous_previews:
             differences(directory, previous_previews / earlier.sha256, output / "diffs" / package.id)

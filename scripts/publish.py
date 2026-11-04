@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 from catalog import Invalid, generate, oldest, packages, read_json, require_sources, revoked
 from previews import verify
+from preview_media import ART
 from simulator import Simulator, acquire, toolchains
 
 
@@ -30,7 +31,7 @@ def main():
         sim = Simulator(acquire(pin, args.cache), pin, args.root / pin["calibration"])
         sim.inspect(package)
         verify(sim, package, args.previews / package.sha256)
-        credits = sim.root / "docs/screenshots/CREDITS.md"
+        credits = ART / "CREDITS.md"
     if args.out.exists():
         shutil.rmtree(args.out)
     generate(args.root, args.out, args.previews, args.base_url, read_json(args.root / "compatibility.json"), built)
