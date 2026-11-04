@@ -85,3 +85,21 @@ class PreviewProof(unittest.TestCase):
         replacement=SimpleNamespace(id=self.package.id,sha256=self.package.sha256,pin={'sha256':'c'*64})
         with patch('previews.expected',return_value=['playing']),self.assertRaises(Invalid):
             verify(self.sim,replacement,directory)
+
+    def test_equivalent_gallery_frames_are_required_without_replacing_the_full_matrix(self):
+        state='sections-3-movie-paused'
+        self.manifest['required']=[state]
+        self.manifest['scenes'][0]['state']=state
+        primary=self.manifest['scenes'][0]
+        self.manifest['scenes'] += [dict(primary,variant=background) for background in ('coast','neon')]
+        directory=self.root/'variants'; directory.mkdir()
+        (directory/(self.digest+'.png')).write_bytes(self.image)
+        def check():
+            (directory/'manifest.json').write_bytes(canonical(self.manifest))
+            with patch('previews.expected',return_value=[state]):
+                return verify(self.sim,self.package,directory)
+        self.assertEqual(len(check()['scenes']),3)
+        self.manifest['scenes'].pop()
+        with self.assertRaises(Invalid): check()
+        self.manifest['scenes'].append(dict(primary,variant='coast'))
+        with self.assertRaises(Invalid): check()

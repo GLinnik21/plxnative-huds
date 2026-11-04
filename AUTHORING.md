@@ -57,7 +57,7 @@ The SDK advertises the complete versioned limits, including the initial 2 MiB ar
 The registry uses its original AI-generated coast, painted village and rain-lit city for every
 preview frame, chapter thumbnail and information image. The pinned SDK still supplies the native
 HUD and complete state matrix. Preview provenance binds the source images and fixture recipe;
-old film-based renders cannot be reused. Generation prompts are in `assets/preview-scenes/scenes.json`.
+old film-based renders cannot be reused. Each gallery scene also has equivalent native frames on all three backgrounds for automatic preview cycling; the HUD state and metadata stay fixed. Generation prompts are in `assets/preview-scenes/scenes.json`.
 
 
 Validation selects the oldest pinned SDK that supports the manifest's package/HUD version pair

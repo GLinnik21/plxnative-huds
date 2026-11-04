@@ -40,8 +40,9 @@ def verify(sim, package, directory, *, published=False):
     verify_provenance(sim, package, manifest, published=published)
     verify_media(manifest)
     names = expected(sim, package)
-    actual = [scene["state"] for scene in manifest.get("scenes", [])]
-    if manifest.get("required") != names or sorted(actual) != sorted(names) or len(set(actual)) != len(actual):
+    actual = [(scene["state"], scene.get("variant")) for scene in manifest.get("scenes", [])]
+    planned = [(name, None) for name in names] + preview_media.variants(names)
+    if manifest.get("required") != names or set(actual) != set(planned) or len(actual) != len(planned):
         raise Invalid(f"incomplete preview state matrix: {package.id}")
     for scene in manifest["scenes"]:
         name = scene["file"]
@@ -61,10 +62,11 @@ def differences(current, previous, output):
     result = []
     current_manifest = read_json(current / "manifest.json")
     before_manifest = read_json(previous / "manifest.json") if (previous / "manifest.json").is_file() else {"scenes":[]}
-    before_states = {scene["state"]:scene["file"] for scene in before_manifest["scenes"]}
+    before_states = {(scene["state"], scene.get("variant")):scene["file"] for scene in before_manifest["scenes"]}
     for scene in current_manifest["scenes"]:
         image = current / scene["file"]
-        before_name = before_states.get(scene["state"])
+        identity = scene["state"] + ("--" + scene["variant"] if scene.get("variant") else "")
+        before_name = before_states.get((scene["state"], scene.get("variant")))
         before = previous / before_name if before_name else None
         if before is None or not before.is_file():
             result.append({"file": image.name, "state":scene["state"], "status": "new"}); continue
@@ -72,8 +74,8 @@ def differences(current, previous, output):
         item = {"file": image.name, "state":scene["state"], "status": "identical" if same else "changed"}
         if not same:
             output.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(before, output / (scene["state"] + ".before.png"))
-            target = output / (scene["state"] + ".diff.png")
+            shutil.copyfile(before, output / (identity + ".before.png"))
+            target = output / (identity + ".diff.png")
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(before), "-i", str(image),
                             "-filter_complex", "blend=all_mode=difference,lutrgb=r=val*4:g=val*4:b=val*4",
                             "-frames:v", "1", str(target)], check=True)
