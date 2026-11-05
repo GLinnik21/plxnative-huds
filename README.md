@@ -4,7 +4,7 @@ Declarative player layouts for [PlxNative](https://github.com/GLinnik21/plx-nati
 A source directory becomes one deterministic `.plxhud` bundle through the native SDK.
 Start with [AUTHORING.md](AUTHORING.md), [the manifest schema](schema/manifest/1.0.json), [the HUD schema](schema/hud/1.0.json) and an [example](examples/).
 
-Reference and Minimal seed the registry. Validation uses the app's exact compiler, all shipped
+The Reference HUD seeds the registry; `examples/` holds the sources to start from. Validation uses the app's exact compiler, all shipped
 languages and the oldest compatible hash-pinned Ubuntu 24.04 x86_64 simulator. CI renders native state previews,
 checks exact native-built archive hashes and prepares a Pages catalog with revocation and compatibility data.
 

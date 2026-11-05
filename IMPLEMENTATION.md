@@ -13,7 +13,7 @@ Python protocol fixtures exercise pipeline behavior with explicitly synthetic ex
 - [ ] Confirm the pin/bundle/binary contract through the registry's native SDK runner.
 - [ ] Pass the indexed native document/archive corpus and all-language package lint.
 - [ ] Record the two native authoring iterations with member and JSON-pointer findings.
-- [ ] Render and inspect the complete Reference and Minimal matrices and normal before/after differences.
+- [ ] Render and inspect the complete Reference matrix and normal before/after differences.
 - [ ] Publish identical validated archive bytes and verify every download and preview hash.
 - [ ] Complete the release-dispatch/recheck path with the new SDK and exact published archives.
 
@@ -44,8 +44,8 @@ retained byte for byte, and the profile binds both report hashes and the SDK's r
 
 Both schema files were copied byte for byte from the verified SDK inventory. Stock Draft 2020-12
 checks passed for all 16 registry/example source documents. The SDK contains 22 native corpus
-cases, including four malformed archives. Execution of that corpus and the complete Reference and
-Minimal capture matrices is the pending registry-native CI gate.
+cases, including four malformed archives. Execution of that corpus and the complete Reference
+capture matrix is the pending registry-native CI gate.
 
 The SDK reports the seven-character source abbreviation `017ff3a`. A regression first exposed the
 registry wrapper's overly strict nine-character minimum. The wrapper accepts the native abbreviation
