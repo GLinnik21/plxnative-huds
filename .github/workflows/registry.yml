@@ -101,7 +101,7 @@ jobs:
         env:
           PACKAGE: ${{ matrix.id }}
           PYTHONUNBUFFERED: '1'
-          REUSE: https://glinnik21.github.io/plxnative-huds
+          REUSE: https://huds.plxnative.com
         run: |
           mkdir -p out/previews
           if [ "$PACKAGE" = __none__ ]; then
@@ -148,7 +148,7 @@ jobs:
         run: echo "HUD_INDEX_SERIAL=$(date -u +%s)" >> "$GITHUB_ENV"
       - name: Verify every preview proof and published byte
         run: |
-          .venv/bin/python scripts/publish.py --base-url https://glinnik21.github.io/plxnative-huds
+          .venv/bin/python scripts/publish.py --base-url https://huds.plxnative.com
           .venv/bin/python scripts/check_site.py out/site
       - name: Sign the index
         if: (github.event_name == 'push' && vars.PUBLISH_PAGES == 'true') || inputs.publish

@@ -165,7 +165,7 @@ def published_packages(root, cache, base_url, local=None):
 
 
 def recheck(root, cache, previous, local=None, notify_repo=None, snapshot=None,
-            base_url="https://glinnik21.github.io/plxnative-huds"):
+            base_url="https://huds.plxnative.com"):
     result = copy.deepcopy(previous)
     tombstones = {item["sha256"] for item in revoked(root)}
     owners = read_json(root / "maintainers.json")
@@ -200,7 +200,7 @@ def main():
     parser.add_argument("--local-simulator", type=Path)
     parser.add_argument("--notify-repo")
     parser.add_argument("--packages", type=Path, help="Use a previously built archive snapshot for an offline check")
-    parser.add_argument("--base-url", default="https://glinnik21.github.io/plxnative-huds")
+    parser.add_argument("--base-url", default="https://huds.plxnative.com")
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
     path = args.out or args.root / "compatibility.json"
