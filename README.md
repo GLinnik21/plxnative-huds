@@ -18,7 +18,7 @@ workflow holds the signing key. `IMPLEMENTATION.md` gives the format, the key ro
 stock `openssl` command that verifies a download.
 
 The registry is public. `IMPLEMENTATION.md` records acceptance evidence. Main deploys the verified
-catalog to [GitHub Pages](https://glinnik21.github.io/plxnative-huds/) with the repository variable
+catalog to [GitHub Pages](https://huds.plxnative.com/) with the repository variable
 `PUBLISH_PAGES=true`. Pushes also retain the catalog as a CI artifact. Disabling that variable
 keeps artifact staging available; a manual workflow dispatch with `publish=true` deploys explicitly.
 

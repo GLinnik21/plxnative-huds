@@ -104,7 +104,7 @@ Verify a published file with stock OpenSSL 3 (macOS's own `openssl` is LibreSSL 
 `head -n 1 index.signed` shows which key signed; set `PUBLIC_KEY_HEX` to that row of `keys.json`:
 
 ```sh
-curl -fsSLO https://glinnik21.github.io/plxnative-huds/index.signed
+curl -fsSLO https://huds.plxnative.com/index.signed
 ```
 
 <!-- verify:begin -->
@@ -179,7 +179,7 @@ Gallery UI, index signatures, a live authoring server and cargo-fuzz are PR13-PR
   [run 41567297415](https://github.com/GLinnik21/plxnative-huds/actions/runs/41567297415),
   which passed all five jobs including deployment.
 - Production readback fetched all 87 files (91,949,606 bytes) from
-  [GitHub Pages](https://glinnik21.github.io/plxnative-huds/) and matched the staged artifact
+  [GitHub Pages](https://huds.plxnative.com/) and matched the staged artifact
   byte for byte, including both original package downloads, preview manifests and all PNG hashes.
   The deployed index SHA-256 is
   `b604f5495c6c713139251de6536dec43bf7bd998f117cad2f7a37522c1f053bb`;
