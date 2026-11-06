@@ -1,9 +1,9 @@
 {
   "$schema": "https://plxnative.com/hud/schema/manifest/1.0.json",
   "package_format": "1.0",
-  "id": "com.plxnative.examples.reference",
+  "id": "com.plxnative.cinema",
   "version": "1.0.0",
-  "name": "Reference",
+  "name": "Cinema",
   "author": "PlxNative",
   "license": "CC0-1.0",
   "hud": {
@@ -13,6 +13,7 @@
   "resources": {
     "subs-bubble": "assets/subs-bubble.svg",
     "list": "assets/list.svg",
+    "info": "assets/info.svg",
     "gear": "assets/gear.svg",
     "eq": "assets/eq.svg",
     "back10": "assets/back10.svg",

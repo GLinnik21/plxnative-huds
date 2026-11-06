@@ -29,7 +29,7 @@ class ReleasePipeline(unittest.TestCase):
         self.root=Path(self.temporary.name)
         self.cache=self.root/'cache'; self.cache.mkdir()
         self.calibration=self.root/'calibration'; self.calibration.mkdir()
-        source=ROOT/'huds/com.plxnative.examples.minimal'
+        source=ROOT/'examples/minimal'
         value=json.loads((source/'manifest.json').read_text()); self.ident=value['id']
         target=self.root/'huds'/self.ident
         shutil.copytree(source, target)
