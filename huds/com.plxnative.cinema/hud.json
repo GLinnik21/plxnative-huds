@@ -7,7 +7,7 @@
     "x_inset": "LG",
     "band": "block",
     "sections": "inline",
-    "scrim": { "cover": "block", "extra": 120 },
+    "scrim": { "cover": "block", "extra": { "value": 160, "if": { "!sections": 120, "!panel.info": 232, "!panel.chapters": 232 } } },
     "block": [
       { "id": "title", "cells": [
         { "align": "start", "vstack": { "gap": 0, "w": "fill", "cells": [

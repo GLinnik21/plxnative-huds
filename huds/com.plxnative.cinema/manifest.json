@@ -2,7 +2,7 @@
   "$schema": "https://plxnative.com/hud/schema/manifest/1.0.json",
   "package_format": "1.0",
   "id": "com.plxnative.cinema",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Cinema",
   "author": "PlxNative",
   "license": "CC0-1.0",
