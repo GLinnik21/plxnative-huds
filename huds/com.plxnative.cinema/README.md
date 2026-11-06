@@ -1,6 +1,6 @@
-# Reference
+# Cinema
 
-PlxNative's reference HUD: a bottom block with the title, a gold scrub bar, one transport row, an inline Chapters
+PlxNative's Cinema HUD: a bottom block with the title, a gold scrub bar, one transport row, an inline Chapters
 strip and an Info card. Its look follows a community mock-up of the player
 ([discussion](https://github.com/GLinnik21/plx-native/discussions/933#discussioncomment-19174382)).
 

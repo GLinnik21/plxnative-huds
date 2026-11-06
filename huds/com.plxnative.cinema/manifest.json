@@ -1,9 +1,9 @@
 {
   "$schema": "https://plxnative.com/hud/schema/manifest/1.0.json",
   "package_format": "1.0",
-  "id": "com.plxnative.examples.reference",
-  "version": "1.1.0",
-  "name": "Reference",
+  "id": "com.plxnative.cinema",
+  "version": "1.0.0",
+  "name": "Cinema",
   "author": "PlxNative",
   "license": "CC0-1.0",
   "hud": {
